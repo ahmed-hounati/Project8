@@ -10,28 +10,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: index.php?error=emptyfields");
         exit();
     } else {
-        $sql = "SELECT * FROM perssonel WHERE Email=?;";
-        $stmt = mysqli_stmt_init($conn);
-        if (!mysqli_stmt_prepare($stmt, $sql)) {
-            header("Location: login.php?error=sqlerror");
-            exit();
-        } else {
-            mysqli_stmt_bind_param($stmt, "s", $email);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            if ($row = mysqli_fetch_assoc($result)) {
-                $passwordCheck = $password === $row['Passdwd'] ? true : false;
-                if ($passwordCheck == false) {
+        $sql = "SELECT * FROM perssonel WHERE Email=:email;";
+        try {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+                $passwordCheck = password_verify($password, $row['Passdwd']);
+                if ($passwordCheck === false) {
                     header("Location: index.php?error=wrongpassword");
                     exit();
-                } elseif ($passwordCheck == true) {
+                } elseif ($passwordCheck === true) {
                     $_SESSION['Email'] = $row['Email'];
 
                     if (isset($row['role'])) {
                         $_SESSION['role'] = $row['role'];
-                    } else {
-                        
                     }
+
                     switch ($_SESSION['role']) {
                         case 'user':
                             header("Location: user/dashboarduser.php");
@@ -42,7 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         case 'scrum_master':
                             header("Location: sm/dashboardsm.php");
                             break;
-                            
                     }
                     exit();
                 }
@@ -50,15 +47,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 header("Location: index.php?error=nonuser");
                 exit();
             }
+        } catch (PDOException $e) {
+            header("Location: login.php?error=sqlerror");
+            exit();
         }
     }
-
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-} else {
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -149,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <div>
                                 <button type="submit" name="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                        
+
                                         </svg>
                                     </span>
                                     Login

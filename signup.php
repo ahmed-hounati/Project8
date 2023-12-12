@@ -9,30 +9,34 @@ if (isset($_POST['submit'])) {
     $phone = $_POST['Tel'];
     $role = $_POST['role'];
     $motdepasse = $_POST['Passdwd'];
+    $Statut = 'active'; // Assuming a default value for the Statut column
 
+    $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, role, Passdwd, Statut) VALUES (:prenom, :nom, :email, :phone, :role, :motdepasse, :Statut)";
 
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':prenom', $prenom);
+        $stmt->bindParam(':nom', $nom);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':role', $role);
+        $stmt->bindParam(':motdepasse', $motdepasse);
+        $stmt->bindParam(':Statut', $Statut);
 
-    $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, role, Passdwd, Statut) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $result = $stmt->execute();
 
-
-    $stmt = mysqli_prepare($conn, $sql);
-
-    mysqli_stmt_bind_param($stmt, "sssssss", $prenom, $nom, $email, $phone, $role, $motdepasse, $Statut);
-
-    $result = mysqli_stmt_execute($stmt);
-
-    if ($result) {
-        header("Location: ./index.php");
-        exit();
-    } else {
-
-        echo "Error: " . mysqli_error($conn);
+        if ($result) {
+            header("Location: ./index.php");
+            exit();
+        } else {
+            echo "Error: " . $stmt->errorInfo()[2];
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
-
-    // Close the statement
-    mysqli_stmt_close($stmt);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

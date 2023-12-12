@@ -41,19 +41,9 @@ require '../includes/conn.inc.php';
                                 <!-- Mobile menu button -->
                                 <button type="button" id="burger-menu" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                                     <span class="sr-only">Open main menu</span>
-                                    <!--
-                    Heroicon name: outline/menu
-
-                    Menu open: "hidden", Menu closed: "block"
-                -->
                                     <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
-                                    <!--
-                    Heroicon name: outline/x
-
-                    Menu open: "block", Menu closed: "hidden"
-                -->
                                     <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -95,72 +85,85 @@ require '../includes/conn.inc.php';
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
                     $sql = "SELECT * FROM perssonel";
-                    $result = mysqli_query($conn, $sql);
-                    while ($row = mysqli_fetch_assoc($result)) {
+
+                    try {
+                        $stmt = $conn->query($sql);
+
+                        // Fetch all rows as an associative array
+                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Loop through the results
+                        foreach ($rows as $row) {
+                            // Your code to handle each row
+                            // Access columns using $row['column_name']
+                            echo $row['column_name'] . "<br>";
+                        }
+                    } catch (PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
                     ?>
-                        <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
-                            <div class="space-y-6 xl:space-y-10">
-                                <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
-                                    <div class="font-medium text-lg leading-6 space-y-1">
-                                        <h3 class="text-indigo-700">ID:
-                                            <?php
-                                            echo $row['Id'];
-                                            ?>
-                                        </h3>
-                                        <h3 class="text-indigo-700"> First name:
-                                            <?php
-                                            echo $row['FirstName'];
-                                            ?>
-                                        </h3>
-                                        <h3 class="text-indigo-700"> Last name:
-                                            <?php
-                                            echo $row['LastName'];
-                                            ?>
-                                        </h3>
-                                        <p class="text-white"> Phone number:
-                                            <?php
-                                            echo $row['Tel'];
-                                            ?>
-                                        </p>
-                                        <p class="text-white"> E-mail:
-                                            <?php
-                                            echo $row['Email'];
-                                            ?>
-                                        </p>
 
-                                        <p class="text-white"> Phone number:
-                                            <?php
-                                            echo $row['Tel'];
-                                            ?>
-                                        </p>
-                                        <p class="text-white"> Role:
-                                            <?php
-                                            echo $row['role'];
-                                            ?>
-                                        </p>
-                                        <p class="text-white"> Team Id:
-                                            <?php
-                                            echo $row['IDTeam'];
-                                            ?>
-                                        </p>
-                                        <p class="text-white"> Statue:
-                                            <?php
-                                            echo $row['Statut'];
-                                            ?>
-                                        </p>
-                                        <p class="text-white"> Creation Date:
-                                            <?php
-                                            echo $row['DateCreation'];
-                                            ?>
-                                        </p>
+                    <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
+                        <div class="space-y-6 xl:space-y-10">
+                            <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
+                                <div class="font-medium text-lg leading-6 space-y-1">
+                                    <h3 class="text-indigo-700">ID:
+                                        <?php
+                                        echo $row['Id'];
+                                        ?>
+                                    </h3>
+                                    <h3 class="text-indigo-700"> First name:
+                                        <?php
+                                        echo $row['FirstName'];
+                                        ?>
+                                    </h3>
+                                    <h3 class="text-indigo-700"> Last name:
+                                        <?php
+                                        echo $row['LastName'];
+                                        ?>
+                                    </h3>
+                                    <p class="text-white"> Phone number:
+                                        <?php
+                                        echo $row['Tel'];
+                                        ?>
+                                    </p>
+                                    <p class="text-white"> E-mail:
+                                        <?php
+                                        echo $row['Email'];
+                                        ?>
+                                    </p>
 
-                                    </div>
+                                    <p class="text-white"> Phone number:
+                                        <?php
+                                        echo $row['Tel'];
+                                        ?>
+                                    </p>
+                                    <p class="text-white"> Role:
+                                        <?php
+                                        echo $row['role'];
+                                        ?>
+                                    </p>
+                                    <p class="text-white"> Team Id:
+                                        <?php
+                                        echo $row['IDTeam'];
+                                        ?>
+                                    </p>
+                                    <p class="text-white"> Statue:
+                                        <?php
+                                        echo $row['Statut'];
+                                        ?>
+                                    </p>
+                                    <p class="text-white"> Creation Date:
+                                        <?php
+                                        echo $row['DateCreation'];
+                                        ?>
+                                    </p>
+
                                 </div>
                             </div>
-                        </li>
+                        </div>
+                    </li>
                     <?php
-                    }
-
                     mysqli_free_result($result);
                     ?>
                 </ul>
