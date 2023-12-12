@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../includes/conn.inc.php';
+require './includes/conn.inc.php';
 
 if (isset($_POST['submit'])) {
     $prenom = $_POST['FirstName'];
@@ -22,7 +22,7 @@ if (isset($_POST['submit'])) {
     $result = mysqli_stmt_execute($stmt);
 
     if ($result) {
-        header("Location: ../index.php");
+        header("Location: ./index.php");
         exit();
     } else {
 
@@ -53,21 +53,7 @@ if (isset($_POST['submit'])) {
                         <div class="flex items-center justify-between h-16 px-4 sm:px-0">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
-                                    <img class="w-[100px]" src="../img/logo-removebg-preview.png" alt="logo">
-                                </div>
-                                <div class="hidden md:block">
-                                    <div class="ml-10 flex items-baseline space-x-4">
-                                        <!-- liens -->
-                                        <a href="./dashboardpo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
-
-                                        <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
-
-                                        <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
-
-                                        <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">logout</a>
-
-                                        <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
-                                    </div>
+                                    <img class="w-[100px]" src="./img/logo-removebg-preview.png" alt="logo">
                                 </div>
                             </div>
                             <div class="hidden md:block">
@@ -91,22 +77,6 @@ if (isset($_POST['submit'])) {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Mobile menu, show/hide based on menu state. -->
-                <div class="border-b border-gray-700 md:hidden" id="nav-links">
-                    <div class="px-2 py-3 space-y-1 sm:px-3">
-                        <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                        <a href="./dashboardpo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
-
-                        <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
-
-                        <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
-
-                        <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</a>
-
-                        <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
                     </div>
                 </div>
         </div>
@@ -173,7 +143,6 @@ if (isset($_POST['submit'])) {
                 </div>
             </div>
 
-            <!-- /End replace -->
         </div>
     </main>
     </div>
