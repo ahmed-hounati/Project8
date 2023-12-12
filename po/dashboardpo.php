@@ -89,6 +89,7 @@ require '../includes/conn.inc.php';
             </div>
         </header>
     </div>
+    </div>
 
     <section class="bg-gray-900">
         <div class="mx-auto py-12 px-4 max-w-7xl sm:px-6 lg:px-8 lg:py-24">
@@ -99,8 +100,8 @@ require '../includes/conn.inc.php';
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
                     $sql = "SELECT * FROM perssonel";
-                    $result = mysqli_query($conn, $sql);
-                    while ($row = mysqli_fetch_assoc($result)) {
+                    $stmt = $pdo->query($sql);
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     ?>
                         <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
                             <div class="space-y-6 xl:space-y-10">
@@ -191,17 +192,11 @@ require '../includes/conn.inc.php';
                         </li>
                     <?php
                     }
-
-                    // Free result set
-                    mysqli_free_result($result);
                     ?>
-                    <!-- More people... -->
                 </ul>
             </div>
         </div>
     </section>
-
-
 
     <script src="./js/script.js"></script>
 </body>

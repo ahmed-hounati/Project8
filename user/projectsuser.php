@@ -101,29 +101,45 @@ require '../includes/conn.inc.php';
                         <div class="mt-12 grid gap-16 pt-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-12">
                             <?php
                             $sql = "SELECT * FROM projects";
-                            $result = mysqli_query($conn, $sql);
-                            while ($row = mysqli_fetch_assoc($result)) {
-                            ?>
-                                <div class="bg-gray-900 p-8 rounded-2xl">
-                                    <a href="#" class="block mt-4">
-                                        <p class="text-xl font-semibold text-white">Project ID: <?php echo $row['IDProject']; ?></p>
-                                    </a>
-                                    <a href="#" class="block mt-4">
-                                        <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
-                                    </a>
-                                    <div class="mt-6 flex items-center">
-                                        <div class="flex-shrink-0"></div>
-                                        <div class="ml-3">
-                                            <p class="text-white"> Description: <?php echo $row['Discription']; ?></p>
-                                            <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
-                                            <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
-                                        </div>
-                                    </div>
 
-                                </div>
-                            <?php
+                            try {
+                                $stmt = $conn->query($sql);
+
+                                // Fetch all rows as an associative array
+                                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                // Loop through the results
+                                foreach ($rows as $row) {
+                                    // Your code to handle each row
+                                    // Access columns using $row['column_name']
+                                    echo $row['column_name'] . "<br>";
+                                }
+                            } catch (PDOException $e) {
+                                echo "Error: " . $e->getMessage();
                             }
-                            mysqli_free_result($result);
+                            ?>
+
+                            <div class="bg-gray-900 p-8 rounded-2xl">
+                                <a href="#" class="block mt-4">
+                                    <p class="text-xl font-semibold text-white">Project ID: <?php echo $row['IDProject']; ?></p>
+                                </a>
+                                <a href="#" class="block mt-4">
+                                    <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
+                                </a>
+                                <div class="mt-6 flex items-center">
+                                    <div class="flex-shrink-0"></div>
+                                    <div class="ml-3">
+                                        <p class="text-white"> Description: <?php echo $row['Discription']; ?></p>
+                                        <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
+                                        <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <?php
+                            if (isset($stmt)) {
+                                $stmt = null; // Set the PDO statement to null to free the result
+                            }
                             ?>
                         </div>
                     </div>

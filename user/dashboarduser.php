@@ -164,7 +164,9 @@ require '../includes/conn.inc.php';
                         </div>
                     </li>
                     <?php
-                    mysqli_free_result($result);
+                    if (isset($stmt)) {
+                        $stmt = null; // Set the PDO statement to null to free the result
+                    }
                     ?>
                 </ul>
             </div>

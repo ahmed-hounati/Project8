@@ -5,35 +5,49 @@ require '../includes/conn.inc.php';
 
 $ID = $_GET['modifierID'];
 
-
 $row = array();
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ProjectName = $_POST['ProjectName'];
     $description = $_POST['Discription'];
     $datedefini = $_POST['Datedefini'];
 
+    try {
+        // Use prepared statement to prevent SQL injection
+        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=? WHERE IDProject = ?";
+        $stmt = $conn->prepare($sql);
 
-    $sql = "UPDATE projects SET ProjectName='$ProjectName', Discription='$description', Datedefini='$datedefini' WHERE IDProject = '$ID'";
-    $result = mysqli_query($conn, $sql);
+        // Bind the parameters
+        $stmt->bindParam(1, $ProjectName);
+        $stmt->bindParam(2, $description);
+        $stmt->bindParam(3, $datedefini);
+        $stmt->bindParam(4, $ID);
 
-    if ($result) {
-        header("Location: ./projects.php");
-        exit();
-    } else {
-        die(mysqli_error($conn));
+        // Execute the statement
+        $result = $stmt->execute();
+
+        // Check for success
+        if ($result) {
+            header("Location: ./projects.php");
+            exit();
+        } else {
+            die("Error updating project: " . $stmt->errorInfo()[2]);
+        }
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
+    } finally {
+        // Close the statement
+        $stmt = null;
     }
 }
 
 $select = "SELECT * FROM projects WHERE IDProject = '$ID'";
-$result = mysqli_query($conn, $select);
-$row = mysqli_fetch_array($result);
+$result = $conn->query($select);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
-
-mysqli_free_result($result);
 ?>
-<!doctype html>
+
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -56,7 +70,7 @@ mysqli_free_result($result);
                                 </div>
                                 <div class="hidden md:block">
                                     <div class="ml-10 flex items-baseline space-x-4">
-                                        <!-- liens -->
+                                        <!-- links -->
                                         <a href="./dashboard.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
 
                                         <a href="./squads.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
@@ -108,8 +122,8 @@ mysqli_free_result($result);
                         <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Sign Up</a>
                     </div>
                 </div>
+            </nav>
         </div>
-        </nav>
     </div>
 
     <section class="">
@@ -136,21 +150,26 @@ mysqli_free_result($result);
                             <input type="text" value="<?php echo $row['IDPO']; ?>" name="IDPO" id="IDPO" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="ID product owner" required />
                         </div>
 
-
                         <div class="relative z-0 w-full mb-5 group">
                             <?php
-                            $sql = "SELECT * FROM projects";
-                            $result1 = mysqli_query($conn, $sql);
+                            try {
+                                $sql = "SELECT * FROM projects";
+                                $result1 = $conn->query($sql);
 
-                            // Check if the query was successful
-                            if ($result1) {
-                                while ($row = mysqli_fetch_assoc($result1)) {
+                                // Check if the query was successful
+                                if ($result1) {
+                                    while ($row = $result1->fetch(PDO::FETCH_ASSOC)) {
+                                        // Your logic for displaying project data
+                                    }
+                                    // Free result set
+                                    $result1 = null;
+                                } else {
+                                    // Handle the error, e.g., display an error message or log the error
+                                    echo "Error: " . $conn->errorInfo()[2];
                                 }
-                                // Free result set
-                                mysqli_free_result($result1);
-                            } else {
-                                // Handle the error, e.g., display an error message or log the error
-                                echo "Error: " . mysqli_connect_error($conn);
+                            } catch (PDOException $e) {
+                                // Handle database connection error
+                                die("Database error: " . $e->getMessage());
                             }
                             ?>
                         </div>
@@ -161,13 +180,7 @@ mysqli_free_result($result);
         </div>
     </section>
 
-
-
-
-
-
     <script src="./js/script.js"></script>
 </body>
-
 
 </html>

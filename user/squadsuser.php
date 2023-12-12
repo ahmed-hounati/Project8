@@ -101,44 +101,59 @@ require '../includes/conn.inc.php';
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
                     $sql = "SELECT * FROM equipes";
-                    $result = mysqli_query($conn, $sql);
-                    while ($row = mysqli_fetch_assoc($result)) {
+
+                    try {
+                        $stmt = $conn->query($sql);
+
+                        // Fetch all rows as an associative array
+                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Loop through the results
+                        foreach ($rows as $row) {
+                            // Your code to handle each row
+                            // Access columns using $row['column_name']
+                            echo $row['column_name'] . "<br>";
+                        }
+                    } catch (PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
                     ?>
-                        <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
-                            <div class="space-y-6 xl:space-y-10">
-                                <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
-                                    <div class="font-medium text-lg leading-6 space-y-1">
-                                        <h3 class="text-indigo-700">Team ID:
-                                            <?php
-                                            echo $row['IDEquipe'];
-                                            ?>
-                                        </h3>
-                                        <h3 class="text-indigo-700"> Team name:
-                                            <?php
-                                            echo $row['NomEquipe'];
-                                            ?>
-                                        </h3>
-                                        <p class="text-white"> Statut:
-                                            <?php
-                                            echo $row['Statut'];
-                                            ?>
-                                        </p>
-                                        <p class="text-white"> Creation Date:
-                                            <?php
-                                            echo $row['DateCreation'];
-                                            ?>
-                                        </p>
 
-                                    </div>
-
+                    <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
+                        <div class="space-y-6 xl:space-y-10">
+                            <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
+                                <div class="font-medium text-lg leading-6 space-y-1">
+                                    <h3 class="text-indigo-700">Team ID:
+                                        <?php
+                                        echo $row['IDEquipe'];
+                                        ?>
+                                    </h3>
+                                    <h3 class="text-indigo-700"> Team name:
+                                        <?php
+                                        echo $row['NomEquipe'];
+                                        ?>
+                                    </h3>
+                                    <p class="text-white"> Statut:
+                                        <?php
+                                        echo $row['Statut'];
+                                        ?>
+                                    </p>
+                                    <p class="text-white"> Creation Date:
+                                        <?php
+                                        echo $row['DateCreation'];
+                                        ?>
+                                    </p>
 
                                 </div>
-                            </div>
-                        </li>
-                    <?php
-                    }
 
-                    mysqli_free_result($result);
+
+                            </div>
+                        </div>
+                    </li>
+                    <?php
+                    if (isset($stmt)) {
+                        $stmt = null; // Set the PDO statement to null to free the result
+                    }
                     ?>
                 </ul>
             </div>

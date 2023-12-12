@@ -1,21 +1,68 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+
+$ID = $_GET['modifierID'];
+
+$row = array();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validate and sanitize input
+    $ProjectName = htmlspecialchars($_POST['ProjectName']);
+    $description = htmlspecialchars($_POST['Discription']);
+    $datedefini = htmlspecialchars($_POST['Datedefini']);
+
+    try {
+        // Use prepared statement to prevent SQL injection
+        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=? WHERE IDProject = ?";
+        $stmt = $conn->prepare($sql);
+
+        // Bind the parameters
+        $stmt->bindParam(1, $ProjectName);
+        $stmt->bindParam(2, $description);
+        $stmt->bindParam(3, $datedefini);
+        $stmt->bindParam(4, $ID);
+
+        // Execute the statement
+        $result = $stmt->execute();
+
+        // Check for success
+        if ($result) {
+            header("Location: ./projects.php");
+            exit();
+        } else {
+            // Handle errors gracefully
+            die("Error updating project: " . $stmt->errorInfo()[2]);
+        }
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
+    } finally {
+        // Close the statement
+        $stmt = null;
+    }
+}
+
+// Fetch project details for the form
+$select = "SELECT * FROM projects WHERE IDProject = '$ID'";
+$result = $conn->query($select);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects</title>
+    <title>Modify Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
 
     <div class="min-h-full">
-        <div class="pb-32">
+        <div class="">
             <nav class="bg-gray-800">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div class="border-b border-gray-700">
@@ -26,14 +73,14 @@ require '../includes/conn.inc.php';
                                 </div>
                                 <div class="hidden md:block">
                                     <div class="ml-10 flex items-baseline space-x-4">
-                                        <!-- liens -->
-                                        <a href="./dashboardpo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
+                                        <!-- links -->
+                                        <a href="./dashboard.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
 
-                                        <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
+                                        <a href="./squads.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
 
                                         <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
 
-                                        <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">logout</a>
+                                        <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
 
                                         <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
                                     </div>
@@ -42,11 +89,8 @@ require '../includes/conn.inc.php';
                             <div class="hidden md:block">
                                 <div class="ml-4 flex items-center md:ml-6">
 
-
                                     <!-- Profile dropdown -->
                                     <div class="ml-3 relative">
-                                        <div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -54,19 +98,9 @@ require '../includes/conn.inc.php';
                                 <!-- Mobile menu button -->
                                 <button type="button" id="burger-menu" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                                     <span class="sr-only">Open main menu</span>
-                                    <!--
-                    Heroicon name: outline/menu
-
-                    Menu open: "hidden", Menu closed: "block"
-                -->
                                     <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
-                                    <!--
-                    Heroicon name: outline/x
-
-                    Menu open: "block", Menu closed: "hidden"
-                -->
                                     <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -80,88 +114,50 @@ require '../includes/conn.inc.php';
                 <div class="border-b border-gray-700 md:hidden" id="nav-links">
                     <div class="px-2 py-3 space-y-1 sm:px-3">
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                        <a href="./dashboardpo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
+                        <a href="./dashboard.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
 
-                        <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
+                        <a href="./squads.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
 
-                        <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
+                        <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
 
-                        <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                        <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
 
-                        <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
+                        <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Sign Up</a>
                     </div>
-
                 </div>
+            </nav>
         </div>
-        </nav>
     </div>
 
-    <main class="-mt-32">
-        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
-            <div class="bg-white pt-16 pb-20 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8">
-                <div class="relative max-w-lg mx-auto divide-y-2 divide-gray-200 lg:max-w-7xl">
-                    <div class="flex justify-between">
-                        <h2 class="text-3xl tracking-tight font-extrabold text-gray-900 sm:text-4xl">Projects</h2>
-                        <a href="addproject.php" class="text-xl tracking-tight font-extrabold text-gray-900 sm:text-xl">Add Project</a>
-                    </div>
-                    <div class="mt-12 grid gap-16 pt-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-12">
-                        <?php
-                        $sql = "SELECT * FROM projects";
-                        $result = mysqli_query($conn, $sql);
-                        while ($row = mysqli_fetch_assoc($result)) {
-                        ?>
-                            <div class="bg-gray-900 p-8 rounded-2xl">
-                                <a href="#" class="block mt-4">
-                                    <p class="text-xl font-semibold text-white">Project ID: <?php echo $row['IDProject']; ?></p>
-                                </a>
-                                <a href="#" class="block mt-4">
-                                    <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
-                                </a>
-                                <div class="mt-6 flex items-center">
-                                    <div class="flex-shrink-0"></div>
-                                    <div class="ml-3">
-                                        <p class="text-white"> Description: <?php echo $row['Discription']; ?></p>
-                                        <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
-                                        <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
-                                    </div>
-                                </div>
-                                <!-- Modify and Delete Project links -->
-                                <ul role="list" class="flex justify-center space-x-5">
-                                    <li>
-                                        <a href="modificationproject.php?modifierID=<?php echo $row['IDProject'] ?>" class="text-indigo-700 hover:text-indigo-700">
-                                            <svg class="w-8 mt-2 h-6" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512">
-                                                <style>
-                                                    svg {
-                                                        fill: #84cc16
-                                                    }
-                                                </style>
-                                                <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H322.8c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1H178.3zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z" />
-                                            </svg>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="deleteproject.php?DeleteID=<?php echo $row['IDProject'] ?>" class="text-indigo-700 hover:text-indigo-700">
-                                            <svg class="w-6 h-6 mt-3" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
-                                                <style>
-                                                    svg {
-                                                        fill: #84cc16
-                                                    }
-                                                </style>
-                                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
-                                            </svg>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        <?php
-                        }
-                        mysqli_free_result($result);
-                        ?>
-                    </div>
+    <section class="">
+        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+            <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                    <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                        Modify Project
+                    </h1>
+                    <form class="max-w-md mx-auto" method="post">
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['ProjectName']; ?>" name="ProjectName" id="ProjectName" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none " placeholder="ProjectName" required />
+                        </div>
+
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['Discription']; ?>" name="Discription" id="Discription" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Description" required />
+                        </div>
+
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['Datedefini']; ?>" name="Datedefini" id="Datedefini" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Final Date : yyyy-mm-dd" required />
+                        </div>
+
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['IDPO']; ?>" name="IDPO" id="IDPO" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="ID product owner" required />
+                        </div>
+                        <button type="submit" name="submit" value="save" class="text-white bg-indigo-700 hover:bg-lime-800 focus:ring-4 focus:outline-none focus:ring-indigo-700 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-indigo-700 dark:hover:bg-indigo-700 dark:focus:ring-indigo-700">Submit</button>
+                    </form>
                 </div>
             </div>
         </div>
-    </main>
+    </section>
 
     <script src="./js/script.js"></script>
 </body>
