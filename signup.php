@@ -129,7 +129,7 @@ if (isset($_POST['submit'])) {
 
                         <div class="flex items-center justify-between">
 
-                            <a href="../index.php" class="text-indigo-600">Login?</a>
+                            <a href="./index.php" class="text-indigo-600">Login?</a>
                         </div>
 
                         <div>
