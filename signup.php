@@ -8,7 +8,7 @@ if (isset($_POST['submit'])) {
     $email = $_POST['Email'];
     $phone = $_POST['Tel'];
     $role = $_POST['role'];
-    $motdepasse = $_POST['Passdwd'];
+    $motdepasse = password_hash($_POST['Passdwd'], PASSWORD_DEFAULT); // Hash the password
     $Statut = 'active'; // Assuming a default value for the Statut column
 
     $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, role, Passdwd, Statut) VALUES (:prenom, :nom, :email, :phone, :role, :motdepasse, :Statut)";
