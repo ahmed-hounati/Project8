@@ -5,8 +5,12 @@ require '../includes/conn.inc.php';
 
 $ID = $_GET['modifierID'];
 
-$row = array();
-
+// Select data
+$select = "SELECT * FROM perssonel WHERE Id = :ID";
+$result = $conn->prepare($select);
+$result->bindParam(':ID', $ID);
+$result->execute();
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = $_POST['first_name'];
@@ -17,24 +21,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $motdepasse = $_POST['Passdwd'];
 
     // Update database
-    $sql = "UPDATE perssonel SET FirstName='$firstName', LastName='$lastName', Email='$email', Passdwd='$motdepasse', Tel='$phone', role='$role' WHERE Id = '$ID'";
-    $result = mysqli_query($conn, $sql);
+    $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Passdwd=:motdepasse, Tel=:phone, role=:role WHERE Id = :ID";
+    $updateResult = $conn->prepare($sql);
+    $updateResult->bindParam(':firstName', $firstName);
+    $updateResult->bindParam(':lastName', $lastName);
+    $updateResult->bindParam(':email', $email);
+    $updateResult->bindParam(':motdepasse', $motdepasse);
+    $updateResult->bindParam(':phone', $phone);
+    $updateResult->bindParam(':role', $role);
+    $updateResult->bindParam(':ID', $ID);
 
-    if ($result) {
+    if ($updateResult->execute()) {
         header("Location: ./dashboardpo.php");
         exit();
     } else {
-        die(mysqli_error($conn));
+        // Handle the error, e.g., display an error message or log the error
+        echo "Error updating record: " . $conn->errorInfo()[2];
     }
 }
-
-// Select data
-$select = "SELECT * FROM perssonel WHERE Id = '$ID'";
-$result = mysqli_query($conn, $select);
-$row = mysqli_fetch_array($result);
-
-// Close the result set
-mysqli_free_result($result);
 ?>
 <!doctype html>
 <html>
@@ -68,7 +72,6 @@ mysqli_free_result($result);
 
                                         <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">logout</a>
 
-                                        <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
                                     </div>
                                 </div>
                             </div>
@@ -105,10 +108,6 @@ mysqli_free_result($result);
                         <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
 
                         <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
-
-                        <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</a>
-
-                        <a href="./signup.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
                     </div>
                 </div>
         </div>
@@ -149,17 +148,14 @@ mysqli_free_result($result);
                         <div class="relative z-0 w-full mb-5 group">
                             <?php
                             $sql = "SELECT * FROM perssonel";
-                            $result1 = mysqli_query($conn, $sql);
+                            $result1 =  $conn->prepare($sql);
 
                             // Check if the query was successful
                             if ($result1) {
-                                while ($row = mysqli_fetch_assoc($result1)) {
+                                while ($row = $result1->fetch(PDO::FETCH_ASSOC)) {
                                 }
-                                // Free result set
-                                mysqli_free_result($result1);
                             } else {
                                 // Handle the error, e.g., display an error message or log the error
-                                echo "Error: " . mysqli_connect_error($conn);
                             }
                             ?>
                         </div>

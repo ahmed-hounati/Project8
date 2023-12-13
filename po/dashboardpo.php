@@ -100,7 +100,7 @@ require '../includes/conn.inc.php';
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
                     $sql = "SELECT * FROM perssonel";
-                    $stmt = $pdo->query($sql);
+                    $stmt = $conn->query($sql);
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     ?>
                         <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">

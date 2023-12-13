@@ -8,26 +8,26 @@ if (isset($_POST['submit'])) {
     $Datedefini = $_POST['Datedefini'];
     $IDPO = $_POST['IDPO'];
 
-    $sql = "INSERT INTO projects (ProjectName, Discription, Datedepart, Datedefini, IDPO) VALUES (?, ?, NOW(), ?, ?)";
+    $sql = "INSERT INTO projects (ProjectName, Discription, Datedepart, Datedefini, IDPO) VALUES (:ProjectName, :Discription, NOW(), :Datedefini, :IDPO)";
 
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':ProjectName', $ProjectName);
+        $stmt->bindParam(':Discription', $Discription);
+        $stmt->bindParam(':Datedefini', $Datedefini);
+        $stmt->bindParam(':IDPO', $IDPO);
 
-    $stmt = mysqli_prepare($conn, $sql);
+        $result = $stmt->execute();
 
-
-    mysqli_stmt_bind_param($stmt, "ssss", $ProjectName, $Discription, $Datedefini, $IDPO);
-
-
-    $result = mysqli_stmt_execute($stmt);
-
-    if ($result) {
-        header("Location: ./projects.php");
-        exit();
-    } else {
-
-        echo "Error: " . mysqli_error($conn);
+        if ($result) {
+            header("Location: ./projects.php");
+            exit();
+        } else {
+            echo "Error: Unable to execute the query.";
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
-
-    mysqli_stmt_close($stmt);
 }
 ?>
 <!DOCTYPE html>
