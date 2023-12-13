@@ -85,90 +85,37 @@ require '../includes/conn.inc.php';
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
                     $sql = "SELECT * FROM perssonel";
+                    $stmt = $conn->query($sql);
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                    try {
-                        $stmt = $conn->query($sql);
-
-                        // Fetch all rows as an associative array
-                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                        // Loop through the results
-                        foreach ($rows as $row) {
-                            // Your code to handle each row
-                            // Access columns using $row['column_name']
-                            echo $row['column_name'] . "<br>";
-                        }
-                    } catch (PDOException $e) {
-                        echo "Error: " . $e->getMessage();
-                    }
+                    foreach ($rows as $row) {
                     ?>
-
-                    <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
-                        <div class="space-y-6 xl:space-y-10">
-                            <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
-                                <div class="font-medium text-lg leading-6 space-y-1">
-                                    <h3 class="text-indigo-700">ID:
-                                        <?php
-                                        echo $row['Id'];
-                                        ?>
-                                    </h3>
-                                    <h3 class="text-indigo-700"> First name:
-                                        <?php
-                                        echo $row['FirstName'];
-                                        ?>
-                                    </h3>
-                                    <h3 class="text-indigo-700"> Last name:
-                                        <?php
-                                        echo $row['LastName'];
-                                        ?>
-                                    </h3>
-                                    <p class="text-white"> Phone number:
-                                        <?php
-                                        echo $row['Tel'];
-                                        ?>
-                                    </p>
-                                    <p class="text-white"> E-mail:
-                                        <?php
-                                        echo $row['Email'];
-                                        ?>
-                                    </p>
-
-                                    <p class="text-white"> Phone number:
-                                        <?php
-                                        echo $row['Tel'];
-                                        ?>
-                                    </p>
-                                    <p class="text-white"> Role:
-                                        <?php
-                                        echo $row['role'];
-                                        ?>
-                                    </p>
-                                    <p class="text-white"> Team Id:
-                                        <?php
-                                        echo $row['IDTeam'];
-                                        ?>
-                                    </p>
-                                    <p class="text-white"> Statue:
-                                        <?php
-                                        echo $row['Statut'];
-                                        ?>
-                                    </p>
-                                    <p class="text-white"> Creation Date:
-                                        <?php
-                                        echo $row['DateCreation'];
-                                        ?>
-                                    </p>
-
+                        <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
+                            <div class="space-y-6 xl:space-y-10">
+                                <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
+                                    <div class="font-medium text-lg leading-6 space-y-1">
+                                        <h3 class="text-indigo-700">ID: <?php echo $row['Id']; ?></h3>
+                                        <h3 class="text-indigo-700">First name: <?php echo $row['FirstName']; ?></h3>
+                                        <h3 class="text-indigo-700">Last name: <?php echo $row['LastName']; ?></h3>
+                                        <p class="text-white">Phone number: <?php echo $row['Tel']; ?></p>
+                                        <p class="text-white">E-mail: <?php echo $row['Email']; ?></p>
+                                        <p class="text-white">Phone number: <?php echo $row['Tel']; ?></p>
+                                        <p class="text-white">Role: <?php echo $row['role']; ?></p>
+                                        <p class="text-white">Team Id: <?php echo $row['IDTeam']; ?></p>
+                                        <p class="text-white">Statue: <?php echo $row['Statut']; ?></p>
+                                        <p class="text-white">Creation Date: <?php echo $row['DateCreation']; ?></p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
                     <?php
+                    }
                     if (isset($stmt)) {
                         $stmt = null; // Set the PDO statement to null to free the result
                     }
                     ?>
                 </ul>
+
             </div>
         </div>
     </section>
