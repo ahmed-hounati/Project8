@@ -4,12 +4,16 @@ require '../includes/conn.inc.php';
 if (isset($_GET['DeleteID'])) {
     $id = $_GET['DeleteID'];
 
-    $sql = "DELETE FROM equipes WHERE IDEquipe= '$id'";
-    $result = mysqli_query($conn, $sql);
-    if ($result) {
+    $sql = "DELETE FROM equipes WHERE IDEquipe= :id";
+
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
         header("Location: ./squads.php");
         exit();
-    } else {
-        die(mysqli_connect_error($conn));
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
 }

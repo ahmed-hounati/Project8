@@ -6,27 +6,22 @@ if (isset($_POST['submit'])) {
     $equipenom = $_POST['NomEquipe'];
     $statut = $_POST['Statut'];
 
-
     $sql = "INSERT INTO equipes (NomEquipe, Statut, DateCreation) VALUES (?, ?, NOW())";
 
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $equipenom, PDO::PARAM_STR);
+        $stmt->bindParam(2, $statut, PDO::PARAM_STR);
+        $stmt->execute();
 
-    $stmt = mysqli_prepare($conn, $sql);
-
-    mysqli_stmt_bind_param($stmt, "ss", $equipenom, $statut);
-
-    $result = mysqli_stmt_execute($stmt);
-
-    if ($result) {
         header("Location: ./squads.php");
         exit();
-    } else {
-        
-        echo "Error: " . mysqli_error($conn);
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
-
-    mysqli_stmt_close($stmt);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -137,10 +132,6 @@ if (isset($_POST['submit'])) {
         </div>
     </main>
     </div>
-
-
-
-
 
     <script src="./js/script.js"></script>
 </body>

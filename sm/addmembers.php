@@ -7,23 +7,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['teamID'], $_POST['user
     $userIDs = $_POST['userIDs'];
 
     if (!empty($userIDs)) {
-        // Use prepared statement to prevent SQL injection
-        $updateQuery = "UPDATE perssonel SET IDTeam = ? WHERE Id IN (" . implode(',', array_fill(0, count($userIDs), '?')) . ")";
-        $stmt = mysqli_prepare($conn, $updateQuery);
+        try {
+            // Use prepared statement to prevent SQL injection
+            $updateQuery = "UPDATE perssonel SET IDTeam = ? WHERE Id IN (" . implode(',', array_fill(0, count($userIDs), '?')) . ")";
+            $stmt = $conn->prepare($updateQuery);
 
-        // Check if the prepare was successful
-        if ($stmt) {
             // Bind the parameters
-            mysqli_stmt_bind_param($stmt, str_repeat('s', count($userIDs) + 1), $teamID, ...$userIDs);
+            $stmt->bindParam(1, $teamID, PDO::PARAM_INT);
+            foreach ($userIDs as $key => $value) {
+                $stmt->bindParam($key + 2, $value, PDO::PARAM_INT);
+            }
 
             // Execute the statement
-            mysqli_stmt_execute($stmt);
+            $stmt->execute();
 
             // Close the statement
-            mysqli_stmt_close($stmt);
-        } else {
-            // Handle prepare error
-            echo "Error preparing statement: " . mysqli_error($conn);
+            $stmt = null;
+        } catch (PDOException $e) {
+            // Handle PDO exceptions
+            echo "Error updating team members: " . $e->getMessage();
         }
     }
 }
@@ -136,27 +138,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['teamID'], $_POST['user
                         <select name="teamID" class="bg-gray-800 text-white border border-gray-600 rounded-md p-2">
                             <?php
                             $teamQuery = "SELECT IDEquipe, NomEquipe FROM equipes";
-                            $teamResult = mysqli_query($conn, $teamQuery);
-                            while ($teamRow = mysqli_fetch_assoc($teamResult)) {
+                            $stmt = $conn->query($teamQuery);
+                            while ($teamRow = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<option value='" . $teamRow['IDEquipe'] . "'>" . $teamRow['NomEquipe'] . "</option>";
                             }
                             ?>
                         </select>
                     </div>
 
-                    <!-- adduser -->
+                    <!-- Add user -->
                     <div class="flex items-center space-x-4">
                         <label class="text-white">Select User(s):</label>
                         <select name="userIDs[]" id="selectUsers" multiple class="bg-gray-800 text-white border border-gray-600 rounded-md p-2">
                             <?php
                             $usersQuery = "SELECT Id, FirstName, LastName FROM perssonel";
-                            $usersResult = mysqli_query($conn, $usersQuery);
-                            while ($userRow = mysqli_fetch_assoc($usersResult)) {
+                            $stmt = $conn->query($usersQuery);
+                            while ($userRow = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<option value='" . $userRow['Id'] . "'>" . $userRow['FirstName'] . ' ' . $userRow['LastName'] . "</option>";
                             }
                             ?>
                         </select>
                     </div>
+
 
                     <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded-md">Add Members</button>
                 </form>

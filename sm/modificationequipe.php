@@ -11,28 +11,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $EquipeName = $_POST['NomEquipe'];
     $statut = $_POST['Statut'];
 
+    $sql = "UPDATE equipes SET NomEquipe=:equipeName, Statut=:statut WHERE IDEquipe = :id";
 
-    $sql = "UPDATE equipes SET NomEquipe='$EquipeName', Statut='statu' WHERE IDEquipe = '$ID'";
-    $result = mysqli_query($conn, $sql);
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':equipeName', $EquipeName, PDO::PARAM_STR);
+        $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $ID, PDO::PARAM_INT);
+        $stmt->execute();
 
-    if ($result) {
         header("Location: ./squads.php");
         exit();
-    } else {
-        die(mysqli_error($conn));
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
 }
 
+$select = "SELECT * FROM equipes WHERE IDEquipe = :id";
+$result = $conn->prepare($select);
+$result->bindParam(':id', $ID, PDO::PARAM_INT);
+$result->execute();
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
-$select = "SELECT * FROM equipes WHERE IDEquipe = '$ID'";
-$result = mysqli_query($conn, $select);
-$row = mysqli_fetch_array($result);
-
-
-mysqli_free_result($result);
 ?>
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -102,8 +105,8 @@ mysqli_free_result($result);
                         <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
                     </div>
                 </div>
+            </nav>
         </div>
-        </nav>
     </div>
 
     <section class="">
@@ -125,14 +128,14 @@ mysqli_free_result($result);
                         <div class="relative z-0 w-full mb-5 group">
                             <?php
                             $sql = "SELECT * FROM equipes";
-                            $result1 = mysqli_query($conn, $sql);
+                            $result1 = $conn->query($sql);
 
                             if ($result1) {
-                                while ($row = mysqli_fetch_assoc($result1)) {
+                                while ($row = $result1->fetch(PDO::FETCH_ASSOC)) {
                                 }
-                                mysqli_free_result($result1);
+                                $result1->closeCursor();
                             } else {
-                                echo "Error: " . mysqli_connect_error($conn);
+                                echo "Error: " . $conn->errorInfo();
                             }
                             ?>
                         </div>
@@ -143,13 +146,7 @@ mysqli_free_result($result);
         </div>
     </section>
 
-
-
-
-
-
     <script src="./js/script.js"></script>
 </body>
-
 
 </html>
