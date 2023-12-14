@@ -103,77 +103,69 @@ require '../includes/conn.inc.php';
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
                     $sql = "SELECT * FROM equipes";
-                    try {
-                        $stmt = $conn->query($sql);
-                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $stmt = $conn->query($sql);
+                    $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                        foreach ($rows as $row) {
+                    foreach ($teams as $team) {
                     ?>
-                            <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
-                                <div class="space-y-6 xl:space-y-10">
-                                    <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
-                                        <div class="font-medium text-lg leading-6 space-y-1">
-                                            <h3 class="text-indigo-700">Team ID:
-                                                <?php
-                                                echo $row['IDEquipe'];
-                                                ?>
+                        <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
+                            <div class="space-y-6 xl:space-y-10">
+                                <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
+                                    <div class="font-medium text-lg leading-6 space-y-1">
+                                        <h3 class="text-white"> Team name:
+                                            <?php echo $team['NomEquipe']; ?>
+                                        </h3>
+                                        <p class="text-white"> Statut:
+                                            <?php echo $team['Statut']; ?>
+                                        </p>
+                                        <h2 class="text-white">Members : </h2>
+                                        <?php
+                                        $sql1 = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";
+                                        $stmt1 = $conn->prepare($sql1);
+                                        $stmt1->bindParam(':teamId', $team['IDEquipe']);
+                                        $stmt1->execute();
+                                        $members = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+
+                                        foreach ($members as $member) {
+                                        ?>
+                                            <h3 class="text-white">
+                                                <?php echo $member['FirstName']; ?> - <?php echo $member['LastName']; ?>
                                             </h3>
-                                            <h3 class="text-indigo-700"> Team name:
-                                                <?php
-                                                echo $row['NomEquipe'];
-                                                ?>
-                                            </h3>
-                                            <p class="text-white"> Statut:
-                                                <?php
-                                                echo $row['Statut'];
-                                                ?>
-                                            </p>
-                                            <p class="text-white"> Creation Date:
-                                                <?php
-                                                echo $row['DateCreation'];
-                                                ?>
-                                            </p>
-
-                                        </div>
-
-                                        <ul role="list" class="flex justify-center space-x-5">
-                                            <li>
-                                                <a href="modificationequipe.php?modifierID=<?php echo $row['IDEquipe'] ?>" class="text-indigo-700 hover:text-indigo-700">
-                                                    <svg class="w-8 h-6" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512">
-                                                        <style>
-                                                            svg {
-                                                                fill: #84cc16
-                                                            }
-                                                        </style>
-                                                        <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H322.8c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1H178.3zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z" />
-                                                    </svg>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="deleteequipe.php?DeleteID=<?php echo $row['IDEquipe'] ?>" class="text-indigo-700 hover:text-indigo-700">
-                                                    <svg class="w-6 h-6 mt-3" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
-                                                        <style>
-                                                            svg {
-                                                                fill: #84cc16
-                                                            }
-                                                        </style>
-                                                        <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
-                                                    </svg>
-                                                </a>
-                                            </li>
-
-                                        </ul>
+                                        <?php
+                                        }
+                                        ?>
                                     </div>
+
+                                    <ul role="list" class="flex justify-center space-x-5">
+                                        <li>
+                                            <a href="modificationequipe.php?modifierID=<?php echo $team['IDEquipe'] ?>" class="text-indigo-700 hover:text-indigo-700">
+                                                <svg class="w-8 h-6" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512">
+                                                    <style>
+                                                        svg {
+                                                            fill: #84cc16
+                                                        }
+                                                    </style>
+                                                    <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H322.8c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1H178.3zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z" />
+                                                </svg>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="deleteequipe.php?DeleteID=<?php echo $team['IDEquipe'] ?>" class="text-indigo-700 hover:text-indigo-700">
+                                                <svg class="w-6 h-6 mt-3" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+                                                    <style>
+                                                        svg {
+                                                            fill: #84cc16
+                                                        }
+                                                    </style>
+                                                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                                                </svg>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </li>
-                            </li>
+                            </div>
+                        </li>
                     <?php
-                        }
-                    } catch (PDOException $e) {
-                        echo "Error: " . $e->getMessage();
-                    } finally {
-                        // Close the PDO statement
-                        $stmt = null;
                     }
                     ?>
                 </ul>

@@ -2,6 +2,7 @@
 session_start();
 require '../includes/conn.inc.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,26 +16,24 @@ require '../includes/conn.inc.php';
 <body>
 
     <div class="min-h-full">
-        <div class="pb-32">
-            <nav class="bg-gray-800">
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div class="border-b border-gray-700">
-                        <div class="flex items-center justify-between h-16 px-4 sm:px-0">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <img class="w-[100px]" src="../img/logo-removebg-preview.png" alt="logo">
-                                </div>
-                                <div class="hidden md:block">
-                                    <div class="ml-10 flex items-baseline space-x-4">
-                                        <!-- liens -->
-                                        <a href="./dashboarduser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+        <nav class="bg-gray-800">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="border-b border-gray-700">
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-0">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <img class="w-[100px]" src="../img/logo-removebg-preview.png" alt="logo">
+                            </div>
+                            <div class="hidden md:block">
+                                <div class="ml-10 flex items-baseline space-x-4">
+                                    <!-- liens -->
+                                    <a href="./dashboarduser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
 
-                                        <a href="./squadsuser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
+                                    <a href="./squadsuser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
 
-                                        <a href="./projectsuser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
+                                    <a href="./projectsuser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
 
-                                        <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">logout</a>
-                                    </div>
+                                    <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">logout</a>
                                 </div>
                             </div>
                             <div class="hidden md:block">
@@ -85,54 +84,65 @@ require '../includes/conn.inc.php';
                         <a href="./projectsuser.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
 
                         <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
+
                     </div>
 
                 </div>
-        </div>
+            </div>
         </nav>
-    </div>
+        <section class="bg-gray-900">
+            <div class="mx-auto py-12 px-4 max-w-7xl sm:px-6 lg:px-8 lg:py-24">
+                <div class="space-y-12">
+                    <div class="space-y-5 flex justify-around sm:space-y-4 md:max-w-xl lg:max-w-3xl xl:max-w-none">
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">Teams Lists</h2>
+                    </div>
+                    <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
+                        <?php
+                        $sql = "SELECT * FROM equipes";
+                        $stmt = $conn->query($sql);
+                        $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    <section class="bg-gray-900">
-        <div class="mx-auto px-4 max-w-7xl sm:px-6 lg:px-8 lg:py-24">
-            <div class="space-y-12">
-                <div class="space-y-5 flex justify-around sm:space-y-4 md:max-w-xl lg:max-w-3xl xl:max-w-none">
-                    <h2 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">Teams Lists</h2>
-                </div>
-                <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
-                    <?php
-                    $sql = "SELECT * FROM equipes";
-                    $stmt = $conn->query($sql);
-                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($teams as $team) {
+                        ?>
+                            <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
+                                <div class="space-y-6 xl:space-y-10">
+                                    <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
+                                        <div class="font-medium text-lg leading-6 space-y-1">
+                                            <h3 class="text-white"> Team name:
+                                                <?php echo $team['NomEquipe']; ?>
+                                            </h3>
+                                            <p class="text-white"> Statut:
+                                                <?php echo $team['Statut']; ?>
+                                            </p>
+                                            <h2 class="text-white">Members : </h2>
+                                            <?php
+                                            $sql1 = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";
+                                            $stmt1 = $conn->prepare($sql1);
+                                            $stmt1->bindParam(':teamId', $team['IDEquipe']);
+                                            $stmt1->execute();
+                                            $members = $stmt1->fetchAll(PDO::FETCH_ASSOC);
 
-                    foreach ($rows as $row) {
-                    ?>
-                        <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
-                            <div class="space-y-6 xl:space-y-10">
-                                <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
-                                    <div class="font-medium text-lg leading-6 space-y-1">
-                                        <h3 class="text-indigo-700">Team ID: <?php echo $row['IDEquipe']; ?></h3>
-                                        <h3 class="text-indigo-700">Team name: <?php echo $row['NomEquipe']; ?></h3>
-                                        <p class="text-white">Statut: <?php echo $row['Statut']; ?></p>
-                                        <p class="text-white">Creation Date: <?php echo $row['DateCreation']; ?></p>
+                                            foreach ($members as $member) {
+                                            ?>
+                                                <h3 class="text-white">
+                                                    <?php echo $member['FirstName']; ?> - <?php echo $member['LastName']; ?>
+                                                </h3>
+                                            <?php
+                                            }
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </li>
-                    <?php
-                    }
-                    if (isset($stmt)) {
-                        $stmt = null; // Set the PDO statement to null to free the result
-                    }
-                    ?>
-                </ul>
+                            </li>
+                        <?php
+                        }
+                        ?>
+                    </ul>
 
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
     </div>
-
-
-
 
     <script src="./js/script.js"></script>
 </body>

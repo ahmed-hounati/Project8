@@ -7,11 +7,12 @@ if (isset($_POST['submit'])) {
     $nom = $_POST['LastName'];
     $email = $_POST['Email'];
     $phone = $_POST['Tel'];
+    $idteam = $_POST['IDTeam'];
     $role = $_POST['role'];
     $motdepasse = password_hash($_POST['Passdwd'], PASSWORD_DEFAULT); // Hash the password
     $Statut = 'active'; // Assuming a default value for the Statut column
 
-    $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, role, Passdwd, Statut) VALUES (:prenom, :nom, :email, :phone, :role, :motdepasse, :Statut)";
+    $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, IDTeam, role, Passdwd, Statut) VALUES (:prenom, :nom, :email, :phone, :IDTeam, :role, :motdepasse, :Statut)";
 
     try {
         $stmt = $conn->prepare($sql);
@@ -19,6 +20,7 @@ if (isset($_POST['submit'])) {
         $stmt->bindParam(':nom', $nom);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':IDTeam', $idteam);
         $stmt->bindParam(':role', $role);
         $stmt->bindParam(':motdepasse', $motdepasse);
         $stmt->bindParam(':Statut', $Statut);
@@ -114,6 +116,10 @@ if (isset($_POST['submit'])) {
                             <div class="p-2">
                                 <label for="email-address" class="sr-only">Email address</label>
                                 <input id="Email" name="Email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address">
+                            </div>
+                            <div class="p-2">
+                                <label for="email-address" class="sr-only">Team ID</label>
+                                <input id="IDTeam" name="IDTeam" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Team Id">
                             </div>
                             <div class="p-2">
                                 <label for="role" class="sr-only">Role</label>

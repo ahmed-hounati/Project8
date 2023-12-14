@@ -1,22 +1,6 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
-
-function getTeamMembers($teamId, $conn)
-{
-    $members = array();
-
-    $sql = "SELECT FirstName, LastName FROM perssonel WHERE IDTeam = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$teamId]);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($rows as $row) {
-        $members[] = $row['FirstName'] . ' ' . $row['LastName'];
-    }
-
-    return $members;
-}
 ?>
 
 <!DOCTYPE html>
@@ -111,7 +95,6 @@ function getTeamMembers($teamId, $conn)
             <div class="space-y-12">
                 <div class="space-y-5 flex justify-around sm:space-y-4 md:max-w-xl lg:max-w-3xl xl:max-w-none">
                     <h2 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">Teams Lists</h2>
-                    <button onclick="showTeamMembers('TEAM')" class="text-indigo-500 text-xl font-extrabold tracking-tight sm:text-xl">Show Team Members</button>
                 </div>
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
                     <?php
@@ -125,53 +108,43 @@ function getTeamMembers($teamId, $conn)
                             <div class="space-y-6 xl:space-y-10">
                                 <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
                                     <div class="font-medium text-lg leading-6 space-y-1">
-                                        <h3 class="text-indigo-700">Team ID:
-                                            <?php echo $team['IDEquipe']; ?>
-                                        </h3>
-                                        <h3 class="text-indigo-700"> Team name:
+                                        <h3 class="text-white"> Team name:
                                             <?php echo $team['NomEquipe']; ?>
                                         </h3>
                                         <p class="text-white"> Statut:
                                             <?php echo $team['Statut']; ?>
                                         </p>
-                                        <p class="text-white"> Creation Date:
-                                            <?php echo $team['DateCreation']; ?>
-                                        </p>
+                                        <h2 class="text-white">Members : </h2>
+                                        <?php
+                                        $sql1 = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";
+                                        $stmt1 = $conn->prepare($sql1);
+                                        $stmt1->bindParam(':teamId', $team['IDEquipe']);
+                                        $stmt1->execute();
+                                        $members = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+
+                                        foreach ($members as $member) {
+                                        ?>
+                                            <h3 class="text-white">
+                                                <?php echo $member['FirstName']; ?> - <?php echo $member['LastName']; ?>
+                                            </h3>
+                                        <?php
+                                        }
+                                        ?>
                                     </div>
                                 </div>
-                            </div>
-                            <div id="team<?php echo $team['IDEquipe']; ?>Members" style="display: none;" class="text-white">
-                                <?php
-                                $teamMembers = getTeamMembers($team['IDEquipe'], $conn);
-
-                                if (!empty($teamMembers)) {
-                                    echo 'Members of ' . $team['NomEquipe'] . ': ' . implode(', ', $teamMembers);
-                                } else {
-                                    echo 'No members found for ' . $team['NomEquipe'];
-                                }
-                                ?>
                             </div>
                         </li>
                     <?php
                     }
                     ?>
                 </ul>
+
             </div>
         </div>
     </section>
     </div>
 
     <script src="./js/script.js"></script>
-    <script>
-        function showTeamMembers(teamId) {
-            var teamMembersDiv = document.getElementById('team' + teamId + 'Members');
-            if (teamMembersDiv.style.display === 'none') {
-                teamMembersDiv.style.display = 'block';
-            } else {
-                teamMembersDiv.style.display = 'none';
-            }
-        }
-    </script>
 </body>
 
 </html>
