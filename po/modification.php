@@ -17,17 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lastName = $_POST['last_name'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
+    $idteam = $_POST['IDTeam'];
     $role = $_POST['role'];
     $motdepasse = $_POST['Passdwd'];
 
     // Update database
-    $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Passdwd=:motdepasse, Tel=:phone, role=:role WHERE Id = :ID";
+    $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Passdwd=:motdepasse, Tel=:phone, IDTeam=:IDTeam, role=:role WHERE Id = :ID";
     $updateResult = $conn->prepare($sql);
     $updateResult->bindParam(':firstName', $firstName);
     $updateResult->bindParam(':lastName', $lastName);
     $updateResult->bindParam(':email', $email);
     $updateResult->bindParam(':motdepasse', $motdepasse);
     $updateResult->bindParam(':phone', $phone);
+    $updateResult->bindParam(':IDTeam', $idteam);
     $updateResult->bindParam(':role', $role);
     $updateResult->bindParam(':ID', $ID);
 
@@ -133,6 +135,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="relative z-0 w-full mb-5 group">
                             <input type="tel" value="<?php echo $row['Tel']; ?>" name="phone" id="phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Phone number (123-456-7890)" required />
+                        </div>
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['IDTeam']; ?>" name="IDTeam" id="IDTeam" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Phone number (123-456-7890)" required />
                         </div>
                         <div class="relative z-0 w-full mb-5 group">
                             <select value="<?php echo $row['role']; ?>" id="role" name="role" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">

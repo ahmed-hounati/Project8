@@ -96,7 +96,6 @@ require '../includes/conn.inc.php';
             <div class="space-y-12">
                 <div class="space-y-5 flex justify-around sm:space-y-4 md:max-w-xl lg:max-w-3xl xl:max-w-none">
                     <h2 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">Teams Lists</h2>
-                    <a href="addmembers.php" class="text-indigo-500 text-xl font-extrabold tracking-tight sm:text-xl">Add users to teams</a>
                     <a href="addsquiad.php" class="text-indigo-500 text-xl font-extrabold tracking-tight sm:text-xl">Add Team</a>
                 </div>
 
