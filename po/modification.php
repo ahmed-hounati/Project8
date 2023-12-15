@@ -3,16 +3,60 @@ session_start();
 
 require '../includes/conn.inc.php';
 
-$ID = $_GET['modifierID'];
+class User
+{
+    private $conn;
 
-// Select data
-$select = "SELECT * FROM perssonel WHERE Id = :ID";
-$result = $conn->prepare($select);
-$result->bindParam(':ID', $ID);
-$result->execute();
-$row = $result->fetch(PDO::FETCH_ASSOC);
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function getUserByID($id)
+    {
+        $select = "SELECT * FROM perssonel WHERE Id = :ID";
+        $result = $this->conn->prepare($select);
+        $result->bindParam(':ID', $id);
+        $result->execute();
+        return $result->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateUser($id, $firstName, $lastName, $email, $phone, $idteam, $role, $motdepasse)
+    {
+        $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Passdwd=:motdepasse, Tel=:phone, IDTeam=:IDTeam, role=:role WHERE Id = :ID";
+
+        try {
+            $updateResult = $this->conn->prepare($sql);
+            $updateResult->bindParam(':firstName', $firstName);
+            $updateResult->bindParam(':lastName', $lastName);
+            $updateResult->bindParam(':email', $email);
+            $updateResult->bindParam(':motdepasse', $motdepasse);
+            $updateResult->bindParam(':phone', $phone);
+            $updateResult->bindParam(':IDTeam', $idteam);
+            $updateResult->bindParam(':role', $role);
+            $updateResult->bindParam(':ID', $id);
+
+            return $updateResult->execute();
+        } catch (PDOException $e) {
+            // Handle PDO errors
+            echo "Error updating record: " . $e->getMessage();
+            return false;
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ID = $_GET['modifierID'];
+
+    $userObj = new User($conn);
+    $user = $userObj->getUserByID($ID);
+
+    if (!$user) {
+        // Handle the error, e.g., display an error message or log the error
+        echo "User not found!";
+        exit();
+    }
+
     $firstName = $_POST['first_name'];
     $lastName = $_POST['last_name'];
     $email = $_POST['email'];
@@ -21,24 +65,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role = $_POST['role'];
     $motdepasse = $_POST['Passdwd'];
 
-    // Update database
-    $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Passdwd=:motdepasse, Tel=:phone, IDTeam=:IDTeam, role=:role WHERE Id = :ID";
-    $updateResult = $conn->prepare($sql);
-    $updateResult->bindParam(':firstName', $firstName);
-    $updateResult->bindParam(':lastName', $lastName);
-    $updateResult->bindParam(':email', $email);
-    $updateResult->bindParam(':motdepasse', $motdepasse);
-    $updateResult->bindParam(':phone', $phone);
-    $updateResult->bindParam(':IDTeam', $idteam);
-    $updateResult->bindParam(':role', $role);
-    $updateResult->bindParam(':ID', $ID);
+    $success = $userObj->updateUser($ID, $firstName, $lastName, $email, $phone, $idteam, $role, $motdepasse);
 
-    if ($updateResult->execute()) {
+    if ($success) {
         header("Location: ./dashboardpo.php");
         exit();
     } else {
         // Handle the error, e.g., display an error message or log the error
-        echo "Error updating record: " . $conn->errorInfo()[2];
+        echo "Error updating record!";
     }
 }
 ?>

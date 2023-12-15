@@ -3,48 +3,80 @@ session_start();
 
 require '../includes/conn.inc.php';
 
-$ID = $_GET['modifierID'];
+class Project
+{
+    private $conn;
 
-$row = array();
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function getProjectByID($id)
+    {
+        $select = "SELECT * FROM projects WHERE IDProject = :ID";
+        $result = $this->conn->prepare($select);
+        $result->bindParam(':ID', $id);
+        $result->execute();
+        return $result->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateProject($id, $projectName, $description, $datedefini)
+    {
+        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=? WHERE IDProject = ?";
+
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(1, $projectName);
+            $stmt->bindParam(2, $description);
+            $stmt->bindParam(3, $datedefini);
+            $stmt->bindParam(4, $id);
+
+            $result = $stmt->execute();
+
+            if ($result) {
+                return true;
+            } else {
+                echo "Error updating project: " . $stmt->errorInfo()[2];
+                return false;
+            }
+        } catch (PDOException $e) {
+            echo "Database error: " . $e->getMessage();
+            return false;
+        } finally {
+            $stmt = null;
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $ProjectName = $_POST['ProjectName'];
+    $ID = $_GET['modifierID'];
+
+    $projectObj = new Project($conn);
+    $project = $projectObj->getProjectByID($ID);
+
+    if (!$project) {
+        echo "Project not found!";
+        exit();
+    }
+
+    $projectName = $_POST['ProjectName'];
     $description = $_POST['Discription'];
     $datedefini = $_POST['Datedefini'];
 
-    try {
-        // Use prepared statement to prevent SQL injection
-        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=? WHERE IDProject = ?";
-        $stmt = $conn->prepare($sql);
+    $success = $projectObj->updateProject($ID, $projectName, $description, $datedefini);
 
-        // Bind the parameters
-        $stmt->bindParam(1, $ProjectName);
-        $stmt->bindParam(2, $description);
-        $stmt->bindParam(3, $datedefini);
-        $stmt->bindParam(4, $ID);
-
-        // Execute the statement
-        $result = $stmt->execute();
-
-        // Check for success
-        if ($result) {
-            header("Location: ./projects.php");
-            exit();
-        } else {
-            die("Error updating project: " . $stmt->errorInfo()[2]);
-        }
-    } catch (PDOException $e) {
-        die("Database error: " . $e->getMessage());
-    } finally {
-        // Close the statement
-        $stmt = null;
+    if ($success) {
+        header("Location: ./projects.php");
+        exit();
+    } else {
+        echo "Error updating project!";
     }
 }
 
 $select = "SELECT * FROM projects WHERE IDProject = '$ID'";
 $result = $conn->query($select);
 $row = $result->fetch(PDO::FETCH_ASSOC);
-
 ?>
 
 <!DOCTYPE html>

@@ -2,31 +2,50 @@
 session_start();
 require '../includes/conn.inc.php';
 
+class Project
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function addProject($ProjectName, $Discription, $Datedefini, $IDPO)
+    {
+        $sql = "INSERT INTO projects (ProjectName, Discription, Datedepart, Datedefini, IDPO) VALUES (:ProjectName, :Discription, NOW(), :Datedefini, :IDPO)";
+
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':ProjectName', $ProjectName);
+            $stmt->bindParam(':Discription', $Discription);
+            $stmt->bindParam(':Datedefini', $Datedefini);
+            $stmt->bindParam(':IDPO', $IDPO);
+
+            $result = $stmt->execute();
+
+            return $result;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+}
+
 if (isset($_POST['submit'])) {
     $ProjectName = $_POST['ProjectName'];
     $Discription = $_POST['Discription'];
     $Datedefini = $_POST['Datedefini'];
     $IDPO = $_POST['IDPO'];
 
-    $sql = "INSERT INTO projects (ProjectName, Discription, Datedepart, Datedefini, IDPO) VALUES (:ProjectName, :Discription, NOW(), :Datedefini, :IDPO)";
+    $projectObj = new Project($conn);
+    $result = $projectObj->addProject($ProjectName, $Discription, $Datedefini, $IDPO);
 
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':ProjectName', $ProjectName);
-        $stmt->bindParam(':Discription', $Discription);
-        $stmt->bindParam(':Datedefini', $Datedefini);
-        $stmt->bindParam(':IDPO', $IDPO);
-
-        $result = $stmt->execute();
-
-        if ($result) {
-            header("Location: ./projects.php");
-            exit();
-        } else {
-            echo "Error: Unable to execute the query.";
-        }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+    if ($result) {
+        header("Location: ./projects.php");
+        exit();
+    } else {
+        echo "Error: Unable to add the project.";
     }
 }
 ?>
