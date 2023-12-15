@@ -3,27 +3,49 @@ session_start();
 
 require '../includes/conn.inc.php';
 
-$ID = $_GET['modifierID'];
+class TeamManager
+{
+    private $conn;
 
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function updateTeam($id, $equipeName, $statut)
+    {
+        $sql = "UPDATE equipes SET NomEquipe=:equipeName, Statut=:statut WHERE IDEquipe = :id";
+
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':equipeName', $equipeName, PDO::PARAM_STR);
+            $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return true;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+}
+
+$teamManager = new TeamManager($conn);
+
+$ID = $_GET['modifierID'];
 $row = array();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $EquipeName = $_POST['NomEquipe'];
+    $equipeName = $_POST['NomEquipe'];
     $statut = $_POST['Statut'];
 
-    $sql = "UPDATE equipes SET NomEquipe=:equipeName, Statut=:statut WHERE IDEquipe = :id";
+    $result = $teamManager->updateTeam($ID, $equipeName, $statut);
 
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':equipeName', $EquipeName, PDO::PARAM_STR);
-        $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $ID, PDO::PARAM_INT);
-        $stmt->execute();
-
+    if ($result === true) {
         header("Location: ./squads.php");
         exit();
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+    } else {
+        echo $result;
     }
 }
 
@@ -32,7 +54,6 @@ $result = $conn->prepare($select);
 $result->bindParam(':id', $ID, PDO::PARAM_INT);
 $result->execute();
 $row = $result->fetch(PDO::FETCH_ASSOC);
-
 ?>
 <!doctype html>
 <html lang="en">

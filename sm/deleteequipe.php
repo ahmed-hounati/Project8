@@ -1,19 +1,42 @@
 <?php
 require '../includes/conn.inc.php';
 
+class TeamManager
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function deleteTeam($id)
+    {
+        $sql = "DELETE FROM equipes WHERE IDEquipe = :id";
+
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return true;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+}
+
+$teamManager = new TeamManager($conn);
+
 if (isset($_GET['DeleteID'])) {
     $id = $_GET['DeleteID'];
 
-    $sql = "DELETE FROM equipes WHERE IDEquipe= :id";
+    $result = $teamManager->deleteTeam($id);
 
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-
+    if ($result === true) {
         header("Location: ./squads.php");
         exit();
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+    } else {
+        echo $result;
     }
 }

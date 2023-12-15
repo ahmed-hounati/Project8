@@ -2,22 +2,45 @@
 session_start();
 require '../includes/conn.inc.php';
 
+class TeamManager
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function addTeam($nomEquipe, $statut)
+    {
+        $sql = "INSERT INTO equipes (NomEquipe, Statut, DateCreation) VALUES (?, ?, NOW())";
+
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(1, $nomEquipe, PDO::PARAM_STR);
+            $stmt->bindParam(2, $statut, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return true;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+}
+
+$teamManager = new TeamManager($conn);
+
 if (isset($_POST['submit'])) {
-    $equipenom = $_POST['NomEquipe'];
+    $nomEquipe = $_POST['NomEquipe'];
     $statut = $_POST['Statut'];
 
-    $sql = "INSERT INTO equipes (NomEquipe, Statut, DateCreation) VALUES (?, ?, NOW())";
+    $result = $teamManager->addTeam($nomEquipe, $statut);
 
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(1, $equipenom, PDO::PARAM_STR);
-        $stmt->bindParam(2, $statut, PDO::PARAM_STR);
-        $stmt->execute();
-
+    if ($result === true) {
         header("Location: ./squads.php");
         exit();
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+    } else {
+        echo $result;
     }
 }
 ?>
@@ -102,29 +125,29 @@ if (isset($_POST['submit'])) {
             <div class="min-h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
                 <div class="max-w-md w-full space-y-8">
                     <div>
-                    <form class="mt-8 space-y-6" action="" method="POST">
-                        <input type="hidden" name="remember" value="true">
-                        <div class="rounded-md shadow-sm -space-y-px">
-                            <div class="p-2">
-                                <label for="NomEquipe" class="sr-only">First name</label>
-                                <input id="NomEquipe" name="NomEquipe" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="NomEquipe">
+                        <form class="mt-8 space-y-6" action="" method="POST">
+                            <input type="hidden" name="remember" value="true">
+                            <div class="rounded-md shadow-sm -space-y-px">
+                                <div class="p-2">
+                                    <label for="NomEquipe" class="sr-only">First name</label>
+                                    <input id="NomEquipe" name="NomEquipe" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="NomEquipe">
+                                </div>
+                                <div class="p-2">
+                                    <label for="Statut" class="sr-only">Password</label>
+                                    <input id="Statut" name="Statut" type="text" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Statut">
+                                </div>
                             </div>
-                            <div class="p-2">
-                                <label for="Statut" class="sr-only">Password</label>
-                                <input id="Statut" name="Statut" type="text" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Statut">
+                            <div>
+                                <button type="submit" name="submit" id="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-700 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                    </span>
+                                    Add
+                                </button>
                             </div>
-                        </div>
-                        <div>
-                            <button type="submit" name="submit" id="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-700 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                </span>
-                                Add
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
     </main>
     </div>
 
