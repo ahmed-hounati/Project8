@@ -2,7 +2,7 @@
 
 require_once './includes/conn.inc.php';
 
-class LogoutHandler
+class Logout
 {
     private $conn;
 
@@ -13,7 +13,6 @@ class LogoutHandler
 
     public function logout()
     {
-        // Destroy the session
         session_start();
         $_SESSION = array();
         session_destroy();
@@ -24,6 +23,7 @@ class LogoutHandler
     }
 }
 
-// Usage
-$logoutHandler = new LogoutHandler($conn);
+$logoutHandler = new Logout($conn);
 $logoutHandler->logout();
+
+?>
