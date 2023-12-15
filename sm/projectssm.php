@@ -1,6 +1,30 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+
+class Project
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function getProjects()
+    {
+        $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, GROUP_CONCAT(perssonel.FirstName, ' ', perssonel.LastName SEPARATOR ', ') AS Members
+                FROM projects 
+                JOIN perssonel ON projects.IDProject = perssonel.IDProject
+                GROUP BY projects.IDProject";
+
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+$projectObj = new Project($conn);
+$projects = $projectObj->getProjects();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,9 +123,10 @@ require '../includes/conn.inc.php';
                         </div>
                         <div class="mt-12 grid gap-16 pt-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-12">
                             <?php
-                            $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, perssonel.FirstName, perssonel.LastName  
-                        FROM projects JOIN perssonel
-                        ON projects.IDProject = perssonel.IDProject";
+                            $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, GROUP_CONCAT(perssonel.FirstName, ' ', perssonel.LastName SEPARATOR ', ') AS Members
+                        FROM projects 
+                        JOIN perssonel ON projects.IDProject = perssonel.IDProject
+                        GROUP BY projects.IDProject";
                             $stmt = $conn->query($sql);
                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             ?>
@@ -116,18 +141,14 @@ require '../includes/conn.inc.php';
                                             <p class="text-white"> Description: <?php echo $row['Discription']; ?></p>
                                             <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
                                             <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
-                                            <p class="text-white"> Members :</p>
-                                            <p class="text-white"> name: <?php echo $row['FirstName']; ?> - <?php echo $row['LastName']; ?></p>
+                                            <p class="text-white"> Members: <?php echo $row['Members']; ?></p>
                                         </div>
                                     </div>
                                 </div>
+                            <?php
+                            }
+                            ?>
                         </div>
-                    <?php
-                            }
-                            if (isset($stmt)) {
-                                $stmt = null; // Set the PDO statement to null to free the result
-                            }
-                    ?>
                     </div>
                 </div>
             </div>

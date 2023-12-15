@@ -1,7 +1,32 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+
+class Project
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function getProjects()
+    {
+        $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, GROUP_CONCAT(perssonel.FirstName, ' ', perssonel.LastName SEPARATOR ', ') AS Members
+                FROM projects 
+                JOIN perssonel ON projects.IDProject = perssonel.IDProject
+                GROUP BY projects.IDProject";
+
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+$projectObj = new Project($conn);
+$projects = $projectObj->getProjects();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,46 +51,25 @@ require '../includes/conn.inc.php';
                                 </div>
                                 <div class="hidden md:block">
                                     <div class="ml-10 flex items-baseline space-x-4">
-                                        <!-- liens -->
+                                        <!-- Links -->
                                         <a href="./dashboardpo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
-
                                         <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
-
                                         <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
-
-                                        <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">logout</a>
-
+                                        <a href="../logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="hidden md:block">
                                 <div class="ml-4 flex items-center md:ml-6">
-
-
-                                    <!-- Profile dropdown -->
-                                    <div class="ml-3 relative">
-                                        <div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             <div class="-mr-2 flex md:hidden">
                                 <!-- Mobile menu button -->
                                 <button type="button" id="burger-menu" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                                     <span class="sr-only">Open main menu</span>
-                                    <!--
-                    Heroicon name: outline/menu
-
-                    Menu open: "hidden", Menu closed: "block"
-                -->
                                     <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
-                                    <!--
-                    Heroicon name: outline/x
-
-                    Menu open: "block", Menu closed: "hidden"
-                -->
                                     <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -80,18 +84,13 @@ require '../includes/conn.inc.php';
                     <div class="px-2 py-3 space-y-1 sm:px-3">
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                         <a href="./dashboardpo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
-
                         <a href="./squadspo.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teams</a>
-
                         <a href="./projects.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
-
                         <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</a>
-
                     </div>
-
                 </div>
+            </nav>
         </div>
-        </nav>
     </div>
 
     <main class="-mt-32">
@@ -104,16 +103,17 @@ require '../includes/conn.inc.php';
                     </div>
                     <div class="mt-12 grid gap-16 pt-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-12">
                         <?php
-                        $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, perssonel.FirstName, perssonel.LastName  
-                        FROM projects JOIN perssonel
-                        ON projects.IDProject = perssonel.IDProject";
+                        $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, GROUP_CONCAT(perssonel.FirstName, ' ', perssonel.LastName SEPARATOR ', ') AS Members
+                        FROM projects 
+                        JOIN perssonel ON projects.IDProject = perssonel.IDProject
+                        GROUP BY projects.IDProject";
                         $stmt = $conn->query($sql);
                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         ?>
                             <div class="bg-gray-900 p-8 rounded-2xl">
                                 <!-- Your project content here -->
                                 <p class="block mt-4">
-                                    <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
+                                <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
                                 </p>
                                 <div class="mt-6 flex items-center">
                                     <div class="flex-shrink-0"></div>
@@ -121,8 +121,7 @@ require '../includes/conn.inc.php';
                                         <p class="text-white"> Description: <?php echo $row['Discription']; ?></p>
                                         <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
                                         <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
-                                        <p class="text-white"> Members :</p>
-                                        <p class="text-white"> name: <?php echo $row['FirstName']; ?> - <?php echo $row['LastName']; ?></p>
+                                        <p class="text-white"> Members: <?php echo $row['Members']; ?></p>
                                     </div>
                                 </div>
                                 <!-- Modify and Delete Project links -->
