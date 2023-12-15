@@ -21,18 +21,18 @@ class User
         return $result->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateUser($id, $firstName, $lastName, $email, $phone, $idteam, $role, $motdepasse)
+    public function updateUser($id, $firstName, $lastName, $email, $phone, $idteam, $idproject, $role)
     {
-        $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Passdwd=:motdepasse, Tel=:phone, IDTeam=:IDTeam, role=:role WHERE Id = :ID";
+        $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Tel=:phone, IDTeam=:IDTeam, IDProject=:IDProject, role=:role WHERE Id = :ID";
 
         try {
             $updateResult = $this->conn->prepare($sql);
             $updateResult->bindParam(':firstName', $firstName);
             $updateResult->bindParam(':lastName', $lastName);
             $updateResult->bindParam(':email', $email);
-            $updateResult->bindParam(':motdepasse', $motdepasse);
             $updateResult->bindParam(':phone', $phone);
             $updateResult->bindParam(':IDTeam', $idteam);
+            $updateResult->bindParam(':IDProject', $idproject);
             $updateResult->bindParam(':role', $role);
             $updateResult->bindParam(':ID', $id);
 
@@ -45,27 +45,23 @@ class User
     }
 }
 
+$ID = isset($_GET['modifierID']) ? $_GET['modifierID'] : null;
+
+// Initialize $userObj
+$userObj = new User($conn);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $ID = $_GET['modifierID'];
-
-    $userObj = new User($conn);
-    $user = $userObj->getUserByID($ID);
-
-    if (!$user) {
-        // Handle the error, e.g., display an error message or log the error
-        echo "User not found!";
-        exit();
-    }
+    // Rest of the code remains unchanged
 
     $firstName = $_POST['first_name'];
     $lastName = $_POST['last_name'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $idteam = $_POST['IDTeam'];
+    $idproject = $_POST['IDProject'];
     $role = $_POST['role'];
-    $motdepasse = $_POST['Passdwd'];
 
-    $success = $userObj->updateUser($ID, $firstName, $lastName, $email, $phone, $idteam, $role, $motdepasse);
+    $success = $userObj->updateUser($ID, $firstName, $lastName, $email, $phone, $idteam, $idproject, $role);
 
     if ($success) {
         header("Location: ./dashboardpo.php");
@@ -75,6 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error updating record!";
     }
 }
+
+$select = "SELECT * FROM perssonel WHERE Id = '$ID'";
+$result = $conn->query($select);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 ?>
 <!doctype html>
 <html>
@@ -171,7 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="tel" value="<?php echo $row['Tel']; ?>" name="phone" id="phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Phone number (123-456-7890)" required />
                         </div>
                         <div class="relative z-0 w-full mb-5 group">
-                            <input type="text" value="<?php echo $row['IDTeam']; ?>" name="IDTeam" id="IDTeam" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Phone number (123-456-7890)" required />
+                            <input type="text" value="<?php echo $row['IDTeam']; ?>" name="IDTeam" id="IDTeam" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Team ID" required />
+                        </div>
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['IDProject']; ?>" name="IDProject" id="IDProject" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Project ID" required />
                         </div>
                         <div class="relative z-0 w-full mb-5 group">
                             <select value="<?php echo $row['role']; ?>" id="role" name="role" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
