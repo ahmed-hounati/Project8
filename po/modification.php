@@ -21,9 +21,10 @@ class User
         return $result->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateUser($id, $firstName, $lastName, $email, $phone, $idteam, $idproject, $role)
+    public function updateUser($id, $firstName, $lastName, $email, $phone, $statut, $idteam, $idproject, $role)
     {
-        $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Tel=:phone, IDTeam=:IDTeam, IDProject=:IDProject, role=:role WHERE Id = :ID";
+        $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Tel=:phone, Statut=:Statut, IDTeam=:IDTeam, IDProject=:IDProject, role=:role WHERE Id = :ID";
+
 
         try {
             $updateResult = $this->conn->prepare($sql);
@@ -31,6 +32,7 @@ class User
             $updateResult->bindParam(':lastName', $lastName);
             $updateResult->bindParam(':email', $email);
             $updateResult->bindParam(':phone', $phone);
+            $updateResult->bindParam(':Statut', $statut);
             $updateResult->bindParam(':IDTeam', $idteam);
             $updateResult->bindParam(':IDProject', $idproject);
             $updateResult->bindParam(':role', $role);
@@ -57,11 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lastName = $_POST['last_name'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
+    $statut = $_POST['Statut'];
     $idteam = $_POST['IDTeam'];
     $idproject = $_POST['IDProject'];
     $role = $_POST['role'];
 
-    $success = $userObj->updateUser($ID, $firstName, $lastName, $email, $phone, $idteam, $idproject, $role);
+    $success = $userObj->updateUser($ID, $firstName, $lastName, $email, $phone, $statut, $idteam, $idproject, $role);
 
     if ($success) {
         header("Location: ./dashboardpo.php");
@@ -169,6 +172,9 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
                         </div>
                         <div class="relative z-0 w-full mb-5 group">
                             <input type="tel" value="<?php echo $row['Tel']; ?>" name="phone" id="phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Phone number (123-456-7890)" required />
+                        </div>
+                        <div class="relative z-0 w-full mb-5 group">
+                            <input type="text" value="<?php echo $row['Statut']; ?>" name="Statut" id="Statut" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Statut" required />
                         </div>
                         <div class="relative z-0 w-full mb-5 group">
                             <input type="text" value="<?php echo $row['IDTeam']; ?>" name="IDTeam" id="IDTeam" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Team ID" required />
