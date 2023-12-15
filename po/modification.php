@@ -146,9 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="product_owner">Product Owner</option>
                             </select>
                         </div>
-                        <div class="relative z-0 w-full mb-5 group">
-                            <input type="password" value="<?php echo $row['Passdwd']; ?>" name="Passdwd" id="Passdwd" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-lime-500 focus:outline-none" placeholder="Password" required />
-                        </div>
 
                         <div class="relative z-0 w-full mb-5 group">
                             <?php

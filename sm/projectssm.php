@@ -76,16 +76,16 @@ require '../includes/conn.inc.php';
 
                 <!-- Mobile menu, show/hide based on menu state. -->
                 <div class="border-b border-gray-700 md:hidden" id="nav-links">
-                <div class="px-2 py-3 space-y-1 sm:px-3">
-                    <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                    <a href="./dashboardsm.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    <div class="px-2 py-3 space-y-1 sm:px-3">
+                        <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                        <a href="./dashboardsm.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
 
-                    <a href="./squads.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
+                        <a href="./squads.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
 
-                    <a href="./projectssm.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
+                        <a href="./projectssm.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
 
-                    <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
-                </div>
+                        <a href="./login.php" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
+                    </div>
                 </div>
             </nav>
         </div>
@@ -99,41 +99,42 @@ require '../includes/conn.inc.php';
                         </div>
                         <div class="mt-12 grid gap-16 pt-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-12">
                             <?php
-                            $sql = "SELECT * FROM projects";
+                            $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, perssonel.FirstName, perssonel.LastName  
+                        FROM projects JOIN perssonel
+                        ON projects.IDProject = perssonel.IDProject";
                             $stmt = $conn->query($sql);
-                            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                            foreach ($rows as $row) {
+                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             ?>
                                 <div class="bg-gray-900 p-8 rounded-2xl">
-                                    <a href="#" class="block mt-4">
-                                        <p class="text-xl font-semibold text-white">Project ID: <?php echo $row['IDProject']; ?></p>
-                                    </a>
-                                    <a href="#" class="block mt-4">
-                                        <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
-                                    </a>
+                                    <!-- Your project content here -->
+                                    <p class="block mt-4">
+                                    <p class="text-xl font-semibold text-white">Project Name: <?php echo $row['ProjectName']; ?></p>
+                                    </p>
                                     <div class="mt-6 flex items-center">
                                         <div class="flex-shrink-0"></div>
                                         <div class="ml-3">
                                             <p class="text-white"> Description: <?php echo $row['Discription']; ?></p>
                                             <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
                                             <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
+                                            <p class="text-white"> Members :</p>
+                                            <p class="text-white"> name: <?php echo $row['FirstName']; ?> - <?php echo $row['LastName']; ?></p>
                                         </div>
                                     </div>
                                 </div>
-                            <?php
+                        </div>
+                    <?php
                             }
                             if (isset($stmt)) {
                                 $stmt = null; // Set the PDO statement to null to free the result
                             }
-                            ?>
-                        </div>
+                    ?>
                     </div>
                 </div>
             </div>
-        </main>
+    </div>
+    </main>
 
-        <script src="./js/script.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 
 </html>

@@ -121,14 +121,6 @@ if (isset($_POST['submit'])) {
                                 <label for="email-address" class="sr-only">Team ID</label>
                                 <input id="IDTeam" name="IDTeam" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Team Id">
                             </div>
-                            <div class="p-2">
-                                <label for="role" class="sr-only">Role</label>
-                                <select id="role" name="role" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
-                                    <option value="user">User</option>
-                                    <option value="scrum_master">Scrum Master</option>
-                                    <option value="product_owner">Product Owner</option>
-                                </select>
-                            </div>
 
                             <div class="p-2">
                                 <label for="password" class="sr-only">Password</label>
