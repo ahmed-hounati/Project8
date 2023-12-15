@@ -1,6 +1,29 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+
+class UserDashboard
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function getUsers()
+    {
+        $sql = "SELECT * FROM perssonel";
+        $stmt = $this->conn->query($sql);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $rows;
+    }
+}
+
+$userDashboard = new UserDashboard($conn);
+$users = $userDashboard->getUsers();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,39 +106,26 @@ require '../includes/conn.inc.php';
                     <h2 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">Users Lists</h2>
                 </div>
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
-                    <?php
-                    $sql = "SELECT * FROM perssonel";
-                    $stmt = $conn->query($sql);
-                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    foreach ($rows as $row) {
-                    ?>
+                    <?php foreach ($users as $user) : ?>
                         <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
                             <div class="space-y-6 xl:space-y-10">
                                 <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
                                     <div class="font-medium text-lg leading-6 space-y-1">
-                                        <h3 class="text-indigo-700">ID: <?php echo $row['Id']; ?></h3>
-                                        <h3 class="text-indigo-700">First name: <?php echo $row['FirstName']; ?></h3>
-                                        <h3 class="text-indigo-700">Last name: <?php echo $row['LastName']; ?></h3>
-                                        <p class="text-white">Phone number: <?php echo $row['Tel']; ?></p>
-                                        <p class="text-white">E-mail: <?php echo $row['Email']; ?></p>
-                                        <p class="text-white">Phone number: <?php echo $row['Tel']; ?></p>
-                                        <p class="text-white">Role: <?php echo $row['role']; ?></p>
-                                        <p class="text-white">Team Id: <?php echo $row['IDTeam']; ?></p>
-                                        <p class="text-white">Statue: <?php echo $row['Statut']; ?></p>
-                                        <p class="text-white">Creation Date: <?php echo $row['DateCreation']; ?></p>
+                                        <h3 class="text-indigo-700">First name: <?php echo $user['FirstName']; ?></h3>
+                                        <h3 class="text-indigo-700">Last name: <?php echo $user['LastName']; ?></h3>
+                                        <p class="text-white">Phone number: <?php echo $user['Tel']; ?></p>
+                                        <p class="text-white">E-mail: <?php echo $user['Email']; ?></p>
+                                        <p class="text-white">Phone number: <?php echo $user['Tel']; ?></p>
+                                        <p class="text-white">Role: <?php echo $user['role']; ?></p>
+                                        <p class="text-white">Team Id: <?php echo $user['IDTeam']; ?></p>
+                                        <p class="text-white">Statue: <?php echo $user['Statut']; ?></p>
+                                        <p class="text-white">Creation Date: <?php echo $user['DateCreation']; ?></p>
                                     </div>
                                 </div>
                             </div>
                         </li>
-                    <?php
-                    }
-                    if (isset($stmt)) {
-                        $stmt = null; // Set the PDO statement to null to free the result
-                    }
-                    ?>
+                    <?php endforeach; ?>
                 </ul>
-
             </div>
         </div>
     </section>
