@@ -1,7 +1,42 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+
+class TeamDashboard
+{
+    private $conn;
+
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function getTeams()
+    {
+        $sql = "SELECT * FROM equipes";
+        $stmt = $this->conn->query($sql);
+        $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $teams;
+    }
+
+    public function getTeamMembers($teamId)
+    {
+        $sql = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':teamId', $teamId);
+        $stmt->execute();
+        $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $members;
+    }
+}
+
+$teamDashboard = new TeamDashboard($conn);
+$teams = $teamDashboard->getTeams();
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -100,41 +135,19 @@ require '../includes/conn.inc.php';
                 </div>
 
                 <ul role="list" class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:grid-cols-3 lg:gap-8">
-                    <?php
-                    $sql = "SELECT * FROM equipes";
-                    $stmt = $conn->query($sql);
-                    $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    foreach ($teams as $team) {
-                    ?>
+                    <?php foreach ($teams as $team) : ?>
                         <li class="py-10 px-6 bg-gray-800 text-center rounded-lg xl:px-10 xl:text-left">
                             <div class="space-y-6 xl:space-y-10">
                                 <div class="space-y-2 xl:flex xl:items-center xl:justify-between">
                                     <div class="font-medium text-lg leading-6 space-y-1">
-                                        <h3 class="text-white"> Team name:
-                                            <?php echo $team['NomEquipe']; ?>
-                                        </h3>
-                                        <p class="text-white"> Statut:
-                                            <?php echo $team['Statut']; ?>
-                                        </p>
+                                        <h3 class="text-white"> Team name: <?php echo $team['NomEquipe']; ?></h3>
+                                        <p class="text-white"> Statut: <?php echo $team['Statut']; ?></p>
                                         <h2 class="text-white">Members : </h2>
-                                        <?php
-                                        $sql1 = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";
-                                        $stmt1 = $conn->prepare($sql1);
-                                        $stmt1->bindParam(':teamId', $team['IDEquipe']);
-                                        $stmt1->execute();
-                                        $members = $stmt1->fetchAll(PDO::FETCH_ASSOC);
-
-                                        foreach ($members as $member) {
-                                        ?>
-                                            <h3 class="text-white">
-                                                <?php echo $member['FirstName']; ?> - <?php echo $member['LastName']; ?>
-                                            </h3>
-                                        <?php
-                                        }
-                                        ?>
+                                        <?php $members = $teamDashboard->getTeamMembers($team['IDEquipe']); ?>
+                                        <?php foreach ($members as $member) : ?>
+                                            <h3 class="text-white"><?php echo $member['FirstName']; ?> - <?php echo $member['LastName']; ?></h3>
+                                        <?php endforeach; ?>
                                     </div>
-
                                     <ul role="list" class="flex justify-center space-x-5">
                                         <li>
                                             <a href="modificationequipe.php?modifierID=<?php echo $team['IDEquipe'] ?>" class="text-indigo-700 hover:text-indigo-700">
@@ -164,9 +177,7 @@ require '../includes/conn.inc.php';
                                 </div>
                             </div>
                         </li>
-                    <?php
-                    }
-                    ?>
+                    <?php endforeach; ?>
                 </ul>
             </div>
         </div>
