@@ -1,42 +1,65 @@
 <?php
-session_start();
 require './includes/conn.inc.php';
 
-if (isset($_POST['submit'])) {
-    $prenom = $_POST['FirstName'];
-    $nom = $_POST['LastName'];
-    $email = $_POST['Email'];
-    $phone = $_POST['Tel'];
-    $idteam = $_POST['IDTeam'];
-    $role = $_POST['role'];
-    $motdepasse = password_hash($_POST['Passdwd'], PASSWORD_DEFAULT); // Hash the password
-    $Statut = 'active'; // Assuming a default value for the Statut column
+session_start();
 
-    $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, IDTeam, role, Passdwd, Statut) VALUES (:prenom, :nom, :email, :phone, :IDTeam, :role, :motdepasse, :Statut)";
+class UserRegistration
+{
+    private $conn;
 
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':prenom', $prenom);
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':IDTeam', $idteam);
-        $stmt->bindParam(':role', $role);
-        $stmt->bindParam(':motdepasse', $motdepasse);
-        $stmt->bindParam(':Statut', $Statut);
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
 
-        $result = $stmt->execute();
+    public function registerUser($firstName, $lastName, $email, $phone, $idTeam, $password)
+    {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $status = 'active';
 
-        if ($result) {
-            header("Location: ./index.php");
-            exit();
-        } else {
-            echo "Error: " . $stmt->errorInfo()[2];
+        $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, IDTeam, Passdwd, Statut) 
+                VALUES (:firstName, :lastName, :email, :phone, :idTeam, :password, :status)";
+
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':firstName', $firstName);
+            $stmt->bindParam(':lastName', $lastName);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':phone', $phone);
+            $stmt->bindParam(':idTeam', $idTeam);
+            $stmt->bindParam(':password', $hashedPassword);
+            $stmt->bindParam(':status', $status);
+
+            $result = $stmt->execute();
+
+            if ($result) {
+                header("Location: ./index.php");
+                exit();
+            } else {
+                echo "Error: " . $stmt->errorInfo()[2];
+            }
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
         }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
     }
 }
+
+if (isset($_POST['submit'])) {
+    $db = new Database();
+    $conn = $db->getConnection();
+
+    $userRegistration = new UserRegistration($conn);
+
+    $userRegistration->registerUser(
+        $_POST['FirstName'],
+        $_POST['LastName'],
+        $_POST['Email'],
+        $_POST['Tel'],
+        $_POST['IDTeam'],
+        $_POST['Passdwd']
+    );
+}
+
 ?>
 
 <!DOCTYPE html>

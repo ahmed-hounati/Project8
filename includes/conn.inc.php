@@ -1,14 +1,29 @@
 <?php
-$serverName = "localhost";
-$DBName = "DataWare";
-$login = "root";
-$password = "";
 
-try {
-    $conn = new PDO("mysql:host=$serverName;dbname=$DBName", $login, $password);
+class Database
+{
+    private $host = "localhost";
+    private $dbName = "DataWare";
+    private $login = "root";
+    private $password = "";
+    private $conn;
 
-    // Set the PDO error mode to exception
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
+    public function __construct()
+    {
+        try {
+            $this->conn = new PDO("mysql:host={$this->host};dbname={$this->dbName}", $this->login, $this->password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Connection failed: " . $e->getMessage());
+        }
+    }
+
+    public function getConnection()
+    {
+        return $this->conn;
+    }
 }
+
+
+$db = new Database();
+$conn = $db->getConnection();

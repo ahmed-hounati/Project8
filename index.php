@@ -1,18 +1,23 @@
 <?php
+
 session_start();
+
 require './includes/conn.inc.php';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = $_POST['Email'];
-    $password = $_POST['Passdwd'];
+class UserAuthentication
+{
+    private $conn;
 
-    if (empty($email) || empty($password)) {
-        header("Location: index.php?error=emptyfields");
-        exit();
-    } else {
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+
+    public function loginUser($email, $password)
+    {
         $sql = "SELECT * FROM perssonel WHERE Email=:email;";
         try {
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':email', $email);
             $stmt->execute();
 
@@ -56,6 +61,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 }
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = $_POST['Email'];
+    $password = $_POST['Passdwd'];
+
+    if (empty($email) || empty($password)) {
+        header("Location: index.php?error=emptyfields");
+        exit();
+    } else {
+        $db = new Database();
+        $conn = $db->getConnection();
+
+        $userAuthentication = new UserAuthentication($conn);
+        $userAuthentication->loginUser($email, $password);
+    }
+}
+
 ?>
 
 
