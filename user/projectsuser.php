@@ -1,29 +1,9 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+require '../classe/User.php';
 
-class Project
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function getProjects()
-    {
-        $sql = "SELECT projects.IDProject, projects.ProjectName, projects.Discription, projects.Datedepart, projects.Datedefini, GROUP_CONCAT(perssonel.FirstName, ' ', perssonel.LastName SEPARATOR ', ') AS Members
-                FROM projects 
-                JOIN perssonel ON projects.IDProject = perssonel.IDProject
-                GROUP BY projects.IDProject";
-
-        $stmt = $this->conn->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-}
-
-$projectObj = new Project($conn);
+$projectObj = new User($conn);
 $projects = $projectObj->getProjects();
 ?>
 <!DOCTYPE html>

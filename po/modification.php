@@ -2,55 +2,13 @@
 session_start();
 
 require '../includes/conn.inc.php';
+require '../classe/po.php';
 
-class User
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function getUserByID($id)
-    {
-        $select = "SELECT * FROM perssonel WHERE Id = :ID";
-        $result = $this->conn->prepare($select);
-        $result->bindParam(':ID', $id);
-        $result->execute();
-        return $result->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function updateUser($id, $firstName, $lastName, $email, $phone, $statut, $idteam, $idproject, $role)
-    {
-        $sql = "UPDATE perssonel SET FirstName=:firstName, LastName=:lastName, Email=:email, Tel=:phone, Statut=:Statut, IDTeam=:IDTeam, IDProject=:IDProject, role=:role WHERE Id = :ID";
-
-
-        try {
-            $updateResult = $this->conn->prepare($sql);
-            $updateResult->bindParam(':firstName', $firstName);
-            $updateResult->bindParam(':lastName', $lastName);
-            $updateResult->bindParam(':email', $email);
-            $updateResult->bindParam(':phone', $phone);
-            $updateResult->bindParam(':Statut', $statut);
-            $updateResult->bindParam(':IDTeam', $idteam);
-            $updateResult->bindParam(':IDProject', $idproject);
-            $updateResult->bindParam(':role', $role);
-            $updateResult->bindParam(':ID', $id);
-
-            return $updateResult->execute();
-        } catch (PDOException $e) {
-            // Handle PDO errors
-            echo "Error updating record: " . $e->getMessage();
-            return false;
-        }
-    }
-}
 
 $ID = isset($_GET['modifierID']) ? $_GET['modifierID'] : null;
 
 // Initialize $userObj
-$userObj = new User($conn);
+$userObj = new Team($conn);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Rest of the code remains unchanged

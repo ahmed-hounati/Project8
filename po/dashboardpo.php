@@ -1,27 +1,11 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+require '../classe/User.php';
 
-class UserDashboard
-{
-    private $conn;
 
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
 
-    public function getUsers()
-    {
-        $sql = "SELECT * FROM perssonel";
-        $stmt = $this->conn->query($sql);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $rows;
-    }
-}
-
-$userDashboard = new UserDashboard($conn);
+$userDashboard = new User($conn);
 $users = $userDashboard->getUsers();
 
 ?>

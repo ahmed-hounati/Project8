@@ -1,37 +1,12 @@
 <?php
 require '../includes/conn.inc.php';
+require '../classe/po.php';
 
-class Project
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function deleteProject($id)
-    {
-        $sql = "DELETE FROM projects WHERE IDProject = :id";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            // Handle PDO errors
-            echo "Error: " . $e->getMessage();
-            return -1;
-        }
-    }
-}
 
 if (isset($_GET['DeleteID'])) {
     $id = $_GET['DeleteID'];
 
-    $projectObj = new Project($conn);
+    $projectObj = new Team($conn);
     $rowCount = $projectObj->deleteProject($id);
 
     if ($rowCount > 0) {

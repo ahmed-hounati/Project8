@@ -1,36 +1,7 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
-
-class Project
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function addProject($ProjectName, $Discription, $Datedefini, $IDPO)
-    {
-        $sql = "INSERT INTO projects (ProjectName, Discription, Datedepart, Datedefini, IDPO) VALUES (:ProjectName, :Discription, NOW(), :Datedefini, :IDPO)";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':ProjectName', $ProjectName);
-            $stmt->bindParam(':Discription', $Discription);
-            $stmt->bindParam(':Datedefini', $Datedefini);
-            $stmt->bindParam(':IDPO', $IDPO);
-
-            $result = $stmt->execute();
-
-            return $result;
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-            return false;
-        }
-    }
-}
+require '../classe/po.php';
 
 if (isset($_POST['submit'])) {
     $ProjectName = $_POST['ProjectName'];
@@ -38,7 +9,7 @@ if (isset($_POST['submit'])) {
     $Datedefini = $_POST['Datedefini'];
     $IDPO = $_POST['IDPO'];
 
-    $projectObj = new Project($conn);
+    $projectObj = new Team($conn);
     $result = $projectObj->addProject($ProjectName, $Discription, $Datedefini, $IDPO);
 
     if ($result) {

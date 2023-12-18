@@ -1,37 +1,12 @@
 <?php
 require '../includes/conn.inc.php';
+require '../classe/po.php';
 
-class User
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function deleteUser($id)
-    {
-        $sql = "DELETE FROM perssonel WHERE Id = :id";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            // Handle PDO errors
-            echo "Error: " . $e->getMessage();
-            return -1;
-        }
-    }
-}
 
 if (isset($_GET['DeleteID'])) {
     $id = $_GET['DeleteID'];
 
-    $userObj = new User($conn);
+    $userObj = new Team($conn);
     $rowCount = $userObj->deleteUser($id);
 
     if ($rowCount > 0) {

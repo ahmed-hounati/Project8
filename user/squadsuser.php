@@ -1,38 +1,9 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+require '../classe/User.php';
 
-class TeamDashboard
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function getTeams()
-    {
-        $sql = "SELECT * FROM equipes";
-        $stmt = $this->conn->query($sql);
-        $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $teams;
-    }
-
-    public function getTeamMembers($teamId)
-    {
-        $sql = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':teamId', $teamId);
-        $stmt->execute();
-        $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $members;
-    }
-}
-
-$teamDashboard = new TeamDashboard($conn);
+$teamDashboard = new User($conn);
 $teams = $teamDashboard->getTeams();
 
 ?>

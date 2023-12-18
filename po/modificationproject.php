@@ -2,57 +2,12 @@
 session_start();
 
 require '../includes/conn.inc.php';
-
-class Project
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function getProjectByID($id)
-    {
-        $select = "SELECT * FROM projects WHERE IDProject = :ID";
-        $result = $this->conn->prepare($select);
-        $result->bindParam(':ID', $id);
-        $result->execute();
-        return $result->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function updateProject($id, $projectName, $description, $datedefini)
-    {
-        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=? WHERE IDProject = ?";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(1, $projectName);
-            $stmt->bindParam(2, $description);
-            $stmt->bindParam(3, $datedefini);
-            $stmt->bindParam(4, $id);
-
-            $result = $stmt->execute();
-
-            if ($result) {
-                return true;
-            } else {
-                echo "Error updating project: " . $stmt->errorInfo()[2];
-                return false;
-            }
-        } catch (PDOException $e) {
-            echo "Database error: " . $e->getMessage();
-            return false;
-        } finally {
-            $stmt = null;
-        }
-    }
-}
+require '../classe/po.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ID = $_GET['modifierID'];
 
-    $projectObj = new Project($conn);
+    $projectObj = new Team($conn);
     $project = $projectObj->getProjectByID($ID);
 
     if (!$project) {

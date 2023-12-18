@@ -2,35 +2,10 @@
 session_start();
 
 require '../includes/conn.inc.php';
+require '../classe/sm.php';
 
-class TeamManager
-{
-    private $conn;
 
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function updateTeam($id, $equipeName, $statut)
-    {
-        $sql = "UPDATE equipes SET NomEquipe=:equipeName, Statut=:statut WHERE IDEquipe = :id";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':equipeName', $equipeName, PDO::PARAM_STR);
-            $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-
-            return true;
-        } catch (PDOException $e) {
-            return "Error: " . $e->getMessage();
-        }
-    }
-}
-
-$teamManager = new TeamManager($conn);
+$teamManager = new Project($conn);
 
 $ID = $_GET['modifierID'];
 $row = array();

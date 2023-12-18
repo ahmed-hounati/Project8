@@ -1,34 +1,9 @@
 <?php
 session_start();
 require '../includes/conn.inc.php';
+require '../classe/sm.php';
 
-class TeamManager
-{
-    private $conn;
-
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function addTeam($nomEquipe, $statut)
-    {
-        $sql = "INSERT INTO equipes (NomEquipe, Statut, DateCreation) VALUES (?, ?, NOW())";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(1, $nomEquipe, PDO::PARAM_STR);
-            $stmt->bindParam(2, $statut, PDO::PARAM_STR);
-            $stmt->execute();
-
-            return true;
-        } catch (PDOException $e) {
-            return "Error: " . $e->getMessage();
-        }
-    }
-}
-
-$teamManager = new TeamManager($conn);
+$teamManager = new Project($conn);
 
 if (isset($_POST['submit'])) {
     $nomEquipe = $_POST['NomEquipe'];
