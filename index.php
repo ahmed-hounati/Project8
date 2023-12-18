@@ -1,6 +1,9 @@
 <?php
 session_start();
 require './includes/conn.inc.php';
+require './classe/User.php';
+
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['Email'];
@@ -10,46 +13,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: index.php?error=emptyfields");
         exit();
     } else {
-        $sql = "SELECT * FROM perssonel WHERE Email=:email;";
-        try {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':email', $email);
-            $stmt->execute();
+        // Create an instance of the UserAuthentication class
+        $authenticator = new User($conn);
 
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Call the login method
+        $result = $authenticator->login($email, $password);
 
-            if ($row) {
-                $passwordCheck = password_verify($password, $row['Passdwd']);
-                if ($passwordCheck === false) {
-                    header("Location: index.php?error=wrongpassword");
-                    exit();
-                } elseif ($passwordCheck === true) {
-                    $_SESSION['Email'] = $row['Email'];
-
-                    if (isset($row['role'])) {
-                        $_SESSION['role'] = $row['role'];
-                    }
-
-                    switch ($_SESSION['role']) {
-                        case 'user':
-                            header("Location: user/dashboarduser.php");
-                            break;
-                        case 'product_owner':
-                            header("Location: po/dashboardpo.php");
-                            break;
-                        case 'scrum_master':
-                            header("Location: sm/dashboardsm.php");
-                            break;
-                    }
-                    exit();
-                }
-            } else {
+        // Handle the result
+        switch ($result) {
+            case 'wrongpassword':
+                header("Location: index.php?error=wrongpassword");
+                exit();
+            case 'nonuser':
                 header("Location: index.php?error=nonuser");
                 exit();
-            }
-        } catch (PDOException $e) {
-            header("Location: login.php?error=sqlerror");
-            exit();
+            case 'sqlerror':
+                header("Location: login.php?error=sqlerror");
+                exit();
+            default:
+                header("Location: $result");
+                exit();
         }
     }
 }
@@ -64,6 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="icon" href="/img/logos.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 

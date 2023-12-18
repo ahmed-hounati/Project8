@@ -29,6 +29,15 @@ class Project
         return $teams;
     }
 
+    public function idpo()
+    {
+        $sql = "SELECT projects.IDPO, perssonel.FirstName, perssonel.LastName
+        FROM projects 
+        JOIN perssonel ON projects.IDPO = perssonel.Id;";
+        $stmt = $this->conn->query($sql);
+        $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getTeamMembers($teamId)
     {
         $sql = "SELECT perssonel.FirstName, perssonel.LastName FROM perssonel WHERE IDTeam = :teamId";

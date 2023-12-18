@@ -1,12 +1,13 @@
 <?php
 session_start();
 
-// Assuming your connection code is now in a file named 'conn.inc.php'
 require './includes/conn.inc.php';
+require './classe/User.php';
+
+
 
 if (isset($_POST['submit'])) {
-    // Assuming the connection code is directly included in 'conn.inc.php'
-    // Otherwise, you can include the connection code here.
+    $personnel = new User($conn);
 
     $firstName = $_POST['FirstName'];
     $lastName = $_POST['LastName'];
@@ -15,33 +16,7 @@ if (isset($_POST['submit'])) {
     $idTeam = $_POST['IDTeam'];
     $password = $_POST['Passdwd'];
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $status = 'active';
-
-    $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, IDTeam, Passdwd, Statut) 
-            VALUES (:firstName, :lastName, :email, :phone, :idTeam, :password, :status)";
-
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':firstName', $firstName);
-        $stmt->bindParam(':lastName', $lastName);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':idTeam', $idTeam);
-        $stmt->bindParam(':password', $hashedPassword);
-        $stmt->bindParam(':status', $status);
-
-        $result = $stmt->execute();
-
-        if ($result) {
-            header("Location: ./index.php");
-            exit();
-        } else {
-            echo "Error: " . $stmt->errorInfo()[2];
-        }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
+    $personnel->addPersonnel($firstName, $lastName, $email, $phone, $idTeam, $password);
 }
 ?>
 
