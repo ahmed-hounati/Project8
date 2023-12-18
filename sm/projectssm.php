@@ -109,13 +109,14 @@ $projects = $projectObj->getProjects();
                             projects.Discription, 
                             projects.Datedepart, 
                             projects.Datedefini, 
-                            GROUP_CONCAT(perssonel.FirstName, ' ', perssonel.LastName SEPARATOR ', ') AS Members,
+                            GROUP_CONCAT(IFNULL(CONCAT(perssonel.FirstName, ' ', perssonel.LastName), '') SEPARATOR ', ') AS Members,
                             po.FirstName AS PO_FirstName,
                             po.LastName AS PO_LastName
                             FROM projects 
-                            JOIN perssonel ON projects.IDProject = perssonel.IDProject
+                            LEFT JOIN perssonel ON projects.IDProject = perssonel.IDProject
                             LEFT JOIN perssonel po ON projects.IDPO = po.Id
-                            GROUP BY projects.IDProject";
+                            GROUP BY projects.IDProject;
+                            ";
 
                             $stmt = $conn->query($sql);
                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -131,7 +132,7 @@ $projects = $projectObj->getProjects();
                                             <p class="text-white"> Start Date: <?php echo $row['Datedepart']; ?></p>
                                             <p class="text-white"> Final Date: <?php echo $row['Datedefini']; ?></p>
                                             <p class="text-white"> Product Owner: <?php echo $row['PO_FirstName'] . ' ' . $row['PO_LastName']; ?></p>
-                                            <p class="text-white"> Members: <?php echo $row['Members']; ?></p>
+                                            <p class="text-white"> Members: <?php echo ($row['Members'] !== '') ? $row['Members'] : 'No members'; ?></p>
                                         </div>
                                     </div>
                                 </div>

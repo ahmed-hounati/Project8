@@ -125,16 +125,17 @@ class Team
         return $result->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateProject($id, $projectName, $description, $datedefini)
+    public function updateProject($id, $projectName, $description, $datedefini, $idpo)
     {
-        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=? WHERE IDProject = ?";
+        $sql = "UPDATE projects SET ProjectName=?, Discription=?, Datedefini=?, IDPO=? WHERE IDProject = ?";
 
         try {
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(1, $projectName);
             $stmt->bindParam(2, $description);
             $stmt->bindParam(3, $datedefini);
-            $stmt->bindParam(4, $id);
+            $stmt->bindParam(4, $idpo);
+            $stmt->bindParam(5, $id);
 
             $result = $stmt->execute();
 

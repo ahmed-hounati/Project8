@@ -4,8 +4,9 @@ session_start();
 require '../includes/conn.inc.php';
 require '../classe/po.php';
 
+$ID = $_GET['modifierID'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $ID = $_GET['modifierID'];
 
     $projectObj = new Team($conn);
     $project = $projectObj->getProjectByID($ID);
@@ -18,8 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $projectName = $_POST['ProjectName'];
     $description = $_POST['Discription'];
     $datedefini = $_POST['Datedefini'];
+    $idpo = $_POST['IDPO'];
 
-    $success = $projectObj->updateProject($ID, $projectName, $description, $datedefini);
+    $success = $projectObj->updateProject($id, $projectName, $description, $datedefini, $idpo);
 
     if ($success) {
         header("Location: ./projects.php");
