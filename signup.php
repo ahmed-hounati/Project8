@@ -1,54 +1,16 @@
 <?php
-require './includes/conn.inc.php';
-
 session_start();
+require './includes/conn.inc.php';
+require './classe/auth.php';
 
-class UserRegistration
-{
-    private $conn;
 
-    public function __construct($conn)
-    {
-        $this->conn = $conn;
-    }
 
-    public function registerUser($firstName, $lastName, $email, $phone, $idTeam, $password)
-    {
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $status = 'active';
-
-        $sql = "INSERT INTO perssonel (FirstName, LastName, Email, Tel, IDTeam, Passdwd, Statut) 
-                VALUES (:firstName, :lastName, :email, :phone, :idTeam, :password, :status)";
-
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':firstName', $firstName);
-            $stmt->bindParam(':lastName', $lastName);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':phone', $phone);
-            $stmt->bindParam(':idTeam', $idTeam);
-            $stmt->bindParam(':password', $hashedPassword);
-            $stmt->bindParam(':status', $status);
-
-            $result = $stmt->execute();
-
-            if ($result) {
-                header("Location: ./index.php");
-                exit();
-            } else {
-                echo "Error: " . $stmt->errorInfo()[2];
-            }
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-}
 
 if (isset($_POST['submit'])) {
     $db = new Database();
     $conn = $db->getConnection();
 
-    $userRegistration = new UserRegistration($conn);
+    $userRegistration = new Auth($conn);
 
     $userRegistration->registerUser(
         $_POST['FirstName'],
