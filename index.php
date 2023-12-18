@@ -1,9 +1,6 @@
 <?php
-
 session_start();
-
 require './includes/conn.inc.php';
-require './classe/auth.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['Email'];
@@ -13,15 +10,51 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: index.php?error=emptyfields");
         exit();
     } else {
-        $db = new Database();
-        $conn = $db->getConnection();
+        $sql = "SELECT * FROM perssonel WHERE Email=:email;";
+        try {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
 
-        $userAuthentication = new Auth($conn);
-        $userAuthentication->loginUser($email, $password);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+                $passwordCheck = password_verify($password, $row['Passdwd']);
+                if ($passwordCheck === false) {
+                    header("Location: index.php?error=wrongpassword");
+                    exit();
+                } elseif ($passwordCheck === true) {
+                    $_SESSION['Email'] = $row['Email'];
+
+                    if (isset($row['role'])) {
+                        $_SESSION['role'] = $row['role'];
+                    }
+
+                    switch ($_SESSION['role']) {
+                        case 'user':
+                            header("Location: user/dashboarduser.php");
+                            break;
+                        case 'product_owner':
+                            header("Location: po/dashboardpo.php");
+                            break;
+                        case 'scrum_master':
+                            header("Location: sm/dashboardsm.php");
+                            break;
+                    }
+                    exit();
+                }
+            } else {
+                header("Location: index.php?error=nonuser");
+                exit();
+            }
+        } catch (PDOException $e) {
+            header("Location: login.php?error=sqlerror");
+            exit();
+        }
     }
 }
-
 ?>
+
 
 
 <!DOCTYPE html>
