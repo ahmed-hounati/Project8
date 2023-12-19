@@ -16,9 +16,5 @@ if (isset($_GET['DeleteID'])) {
         // No rows affected, record not found
         header("Location: ./projects.php?error=recordnotfound");
         exit();
-    } else {
-        // Error occurred during deletion
-        header("Location: ./projects.php?error=deleteerror");
-        exit();
     }
 }

@@ -46,21 +46,35 @@ class Team
         }
     }
 
+    // Update your deleteProject method in the Team class
     public function deleteProject($id)
     {
-        $sql = "DELETE FROM projects WHERE IDProject = :id";
+        // Set foreign key checks to 0 temporarily
+        $this->conn->exec('SET foreign_key_checks = 0');
+
+        // Delete project and related personnel records
+        $sql = "DELETE projects, perssonel FROM projects
+            LEFT JOIN perssonel ON projects.IDProject = perssonel.IDProject
+            WHERE projects.IDProject = :id";
 
         try {
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':id', $id);
             $stmt->execute();
 
+            // Set foreign key checks back to 1
+            $this->conn->exec('SET foreign_key_checks = 1');
+
             return $stmt->rowCount();
         } catch (PDOException $e) {
+            // Set foreign key checks back to 1 in case of an exception
+            $this->conn->exec('SET foreign_key_checks = 1');
+
             echo "Error: " . $e->getMessage();
             return -1;
         }
     }
+
 
     public function addProject($ProjectName, $Discription, $Datedefini, $IDPO)
     {
