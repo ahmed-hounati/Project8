@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 18 déc. 2023 à 14:49
+-- Généré le : mar. 19 déc. 2023 à 11:26
 -- Version du serveur : 10.4.28-MariaDB
 -- Version de PHP : 8.2.4
 SET
@@ -107,32 +107,6 @@ VALUES
         'product_owner'
     ),
     (
-        6,
-        'mahdooooo',
-        'aziz',
-        'mahdiaziz@gmail.com',
-        '$2y$10$8GllKUlBl827zqX6uNcS6uauoPJ2As8EpIOA4MKx.0dyZwZTgoqGO',
-        '0695909100',
-        2,
-        'inActive',
-        '2023-11-28 19:44:00',
-        2,
-        'user'
-    ),
-    (
-        7,
-        'nassim',
-        'bonnani',
-        'nassim1@gmail.com',
-        '$2y$10$s2qSxvYribuEuJFZ8IYb7eakeThZUuWK3f4kf0ViWHfgaWowx3z1.',
-        '0628553257',
-        3,
-        'active',
-        '2023-11-28 19:57:47',
-        2,
-        'scrum_master'
-    ),
-    (
         8,
         'hamza',
         'himmi',
@@ -143,32 +117,6 @@ VALUES
         'active',
         '2023-11-28 20:02:28',
         1,
-        'user'
-    ),
-    (
-        9,
-        'abdo',
-        'lumii',
-        'abdo@gmail.com',
-        '$2y$10$GREuml0nvdIOlgYZ.2GFTO/YhotN1x.ydee.ZKM/9et5yf5W/2f9i',
-        '7894560',
-        7,
-        'active',
-        '2023-12-14 18:46:27',
-        2,
-        'user'
-    ),
-    (
-        10,
-        'moad',
-        'toto',
-        'toto@gmail.com',
-        '$2y$10$qdgShjk8z0BDoZO0NVZDBuOHC5rHuOdcejvvrEGNUcxUGjpPWM0ce',
-        '1234567890',
-        1,
-        'active',
-        '2023-12-15 11:34:05',
-        2,
         'user'
     );
 
@@ -204,15 +152,7 @@ VALUES
         'this is project 1',
         '2023-11-28 11:07:35',
         '2023-30-12',
-        0
-    ),
-    (
-        2,
-        'projectX',
-        'halaloya',
-        '2023-11-28 12:22:43',
-        '2023-12-10',
-        0
+        1
     );
 
 --
@@ -244,7 +184,9 @@ ADD
 ALTER TABLE
     `projects`
 ADD
-    PRIMARY KEY (`IDProject`);
+    PRIMARY KEY (`IDProject`),
+ADD
+    KEY `IDPO` (`IDPO`);
 
 --
 -- AUTO_INCREMENT pour les tables déchargées
@@ -265,7 +207,7 @@ ALTER TABLE
     `perssonel`
 MODIFY
     `Id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 11;
+    AUTO_INCREMENT = 12;
 
 --
 -- AUTO_INCREMENT pour la table `projects`
@@ -274,7 +216,7 @@ ALTER TABLE
     `projects`
 MODIFY
     `IDProject` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 3;
+    AUTO_INCREMENT = 5;
 
 --
 -- Contraintes pour les tables déchargées
@@ -287,7 +229,17 @@ ALTER TABLE
 ADD
     CONSTRAINT `perssonel_ibfk_1` FOREIGN KEY (`IDTeam`) REFERENCES `equipes` (`IDEquipe`),
 ADD
-    CONSTRAINT `perssonel_ibfk_2` FOREIGN KEY (`IDProject`) REFERENCES `projects` (`IDProject`);
+    CONSTRAINT `perssonel_ibfk_2` FOREIGN KEY (`IDProject`) REFERENCES `projects` (`IDProject`) ON DELETE CASCADE,
+ADD
+    CONSTRAINT `perssonel_ibfk_3` FOREIGN KEY (`IDProject`) REFERENCES `projects` (`IDProject`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `projects`
+--
+ALTER TABLE
+    `projects`
+ADD
+    CONSTRAINT `projects_ibfk_1` FOREIGN KEY (`IDPO`) REFERENCES `perssonel` (`Id`);
 
 COMMIT;
 
